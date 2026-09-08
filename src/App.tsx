@@ -43,7 +43,12 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [viewMode, setViewMode] = useState<ViewMode>('main');
-  const [isStandaloneAdmin, setIsStandaloneAdmin] = useState(() => window.location.hash.startsWith('#/admin'));
+  const isAdminPath = () =>
+    typeof window !== 'undefined' &&
+    (window.location.pathname === '/admin' ||
+      window.location.pathname.startsWith('/admin/') ||
+      window.location.hash.startsWith('#/admin'));
+  const [isStandaloneAdmin, setIsStandaloneAdmin] = useState(isAdminPath);
 
   // Google Auth Gate & Project Deletion states
   const [showGoogleAuthModal, setShowGoogleAuthModal] = useState<boolean>(false);
@@ -91,9 +96,13 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const syncRoute = () => setIsStandaloneAdmin(window.location.hash.startsWith('#/admin'));
+    const syncRoute = () => setIsStandaloneAdmin(isAdminPath());
     window.addEventListener('hashchange', syncRoute);
-    return () => window.removeEventListener('hashchange', syncRoute);
+    window.addEventListener('popstate', syncRoute);
+    return () => {
+      window.removeEventListener('hashchange', syncRoute);
+      window.removeEventListener('popstate', syncRoute);
+    };
   }, []);
 
   const handleToggleTheme = () => {
@@ -130,7 +139,10 @@ export default function App() {
 
   // Open Admin Dashboard directly
   const handleOpenAdmin = () => {
-    window.location.hash = '#/admin';
+    if (window.location.pathname !== '/admin') {
+      window.history.pushState(null, '', '/admin');
+    }
+    setIsStandaloneAdmin(true);
   };
 
   // Sync Clerk authenticated user into app currentUser and storage

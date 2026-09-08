@@ -22,7 +22,17 @@ export const AdminPage: React.FC<AdminPageProps> = (props) => (
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-600/30"><ShieldCheck className="h-5 w-5" /></div>
           <div><p className="text-sm font-black">Bgern Admin</p><p className="text-[11px] text-slate-400">Operations workspace</p></div>
         </div>
-        <button onClick={() => { window.location.hash = '#/'; }} className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800">
+        <button
+          onClick={() => {
+            if (window.location.pathname.startsWith('/admin')) {
+              window.history.pushState(null, '', '/');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            } else {
+              window.location.hash = '#/';
+            }
+          }}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800"
+        >
           <ArrowLeft className="h-3.5 w-3.5" /> Creator app
         </button>
       </div>
