@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#1e3a8a" flood-opacity="0.3" />
+    </filter>
+  </defs>
+  <!-- Background squircle -->
+  <rect x="32" y="32" width="448" height="448" rx="112" fill="url(#blueGrad)" filter="url(#shadow)" />
+  
+  <!-- Video frame symbol -->
+  <rect x="110" y="120" width="292" height="200" rx="28" fill="#FFFFFF" fill-opacity="0.15" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" />
+  
+  <!-- Play triangle in center -->
+  <path d="M 230 180 L 305 220 L 230 260 Z" fill="#FFFFFF" />
+  
+  <!-- Caption banner with Ge'ez text 'አማ' style stripes -->
+  <rect x="140" y="348" width="232" height="24" rx="12" fill="#FACC15" />
+  <rect x="175" y="388" width="162" height="20" rx="10" fill="#FFFFFF" fill-opacity="0.9" />
+</svg>

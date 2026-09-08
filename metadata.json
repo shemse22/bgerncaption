@@ -1,0 +1,6 @@
+{
+  "name": "Amharic Caption Generator",
+  "description": "Professional Amharic video caption generator with video duration detection, styling engine, burned video export, minute wallet, receipt verification, and PWA support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

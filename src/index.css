@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Ethiopic & Amharic Font Mappings */
+@font-face {
+  font-family: 'Easy Amharic Typing';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Abyssinica SIL'), local('Noto Sans Ethiopic'), url('https://fonts.gstatic.com/s/abyssinicasil/v9/oY1H8ezOqK7iI3rK_45WKoc8J6UZ.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Abyssinica';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Abyssinica SIL'), url('https://fonts.gstatic.com/s/abyssinicasil/v9/oY1H8ezOqK7iI3rK_45WKoc8J6UZ.ttf') format('truetype');
+}
+
+@layer utilities {
+  /* Font Family Helpers */
+  .font-easy-amharic {
+    font-family: 'Easy Amharic Typing', 'Abyssinica SIL', 'Noto Sans Ethiopic', sans-serif;
+  }
+  .font-noto-sans-ethiopic {
+    font-family: 'Noto Sans Ethiopic', sans-serif;
+  }
+  .font-noto-serif-ethiopic {
+    font-family: 'Noto Serif Ethiopic', 'Abyssinica SIL', serif;
+  }
+  .font-abyssinica {
+    font-family: 'Abyssinica SIL', 'Abyssinica', serif;
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  /* Fast responsive touch feedback */
+  .touch-tap {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+body {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

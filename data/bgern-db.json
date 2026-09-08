@@ -1,0 +1,498 @@
+{
+  "users": [
+    {
+      "id": "usr-1",
+      "name": "Shemsedin Abate",
+      "email": "thebigel16@gmail.com",
+      "avatar": "https://unavatar.io/thebigel16@gmail.com?fallback=https://ui-avatars.com/api/?name=Shemsedin+Abate&background=1a73e8&color=fff&size=256&bold=true&font-size=0.45",
+      "googleOriginalAvatar": "https://unavatar.io/thebigel16@gmail.com?fallback=https://ui-avatars.com/api/?name=Shemsedin+Abate&background=1a73e8&color=fff&size=256&bold=true&font-size=0.45",
+      "role": "admin",
+      "availableMinutes": 180,
+      "plan": "free",
+      "status": "active",
+      "createdAt": "2026-04-20T10:00:00Z",
+      "provider": "google",
+      "googleId": "goog-thebigel16",
+      "channelHandle": "@shemsedin",
+      "bio": "Video editor creating Amharic content with Bgern.",
+      "preferredLanguage": "Amharic",
+      "autoGenerateThumbnails": true
+    },
+    {
+      "id": "usr-2",
+      "name": "Abebe Kebede",
+      "email": "abebe@email.com",
+      "role": "user",
+      "availableMinutes": 742,
+      "plan": "creator",
+      "status": "active",
+      "createdAt": "2026-04-18T09:30:00Z"
+    },
+    {
+      "id": "usr-3",
+      "name": "Hana Tesfaye",
+      "email": "hana@email.com",
+      "role": "user",
+      "availableMinutes": 3000,
+      "plan": "pro",
+      "status": "active",
+      "createdAt": "2026-04-15T14:10:00Z"
+    },
+    {
+      "id": "usr-4",
+      "name": "Dawit Alemu",
+      "email": "dawit@email.com",
+      "role": "user",
+      "availableMinutes": 0,
+      "plan": "free",
+      "status": "active",
+      "createdAt": "2026-04-19T11:00:00Z"
+    },
+    {
+      "id": "usr-5",
+      "name": "Sara Mohammed",
+      "email": "sara@email.com",
+      "role": "user",
+      "availableMinutes": 180,
+      "plan": "starter",
+      "status": "active",
+      "createdAt": "2026-04-21T08:00:00Z"
+    },
+    {
+      "id": "usr-6",
+      "name": "Michael Brown",
+      "email": "michael@email.com",
+      "role": "user",
+      "availableMinutes": 1000,
+      "plan": "free",
+      "status": "suspended",
+      "createdAt": "2026-04-10T12:00:00Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-1",
+      "userId": "usr-1",
+      "title": "video_interview.mp4",
+      "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80",
+      "duration": 154,
+      "fileSizeMb": 42.5,
+      "status": "completed",
+      "progress": 100,
+      "captionLanguage": "Amharic",
+      "captionMode": "speech_amharic",
+      "segments": [
+        {
+          "id": "seg-1",
+          "start": 0.5,
+          "end": 3.8,
+          "text": "እንደምን አደራችሁ ክቡራትና ክቡራን።"
+        },
+        {
+          "id": "seg-2",
+          "start": 4.2,
+          "end": 7.9,
+          "text": "ዛሬ ወደ አዲስ የቪዲዮ ይዘት እንኳን ደህና መጣችሁ።"
+        },
+        {
+          "id": "seg-3",
+          "start": 8.4,
+          "end": 12.1,
+          "text": "የዛሬው ርዕሳችን ስለ ዲጂታል ፈጠራ እና ቴክኖሎጂ ነው።"
+        },
+        {
+          "id": "seg-4",
+          "start": 12.6,
+          "end": 16.5,
+          "text": "ይህንን ቪዲዮ እስከ መጨረሻው እንዲከታተሉ እንጋብዛለን።"
+        },
+        {
+          "id": "seg-5",
+          "start": 17,
+          "end": 21.2,
+          "text": "አስተያየት ካላችሁ በኮሜንት መስጫው ላይ ጻፉልን።"
+        }
+      ],
+      "style": {
+        "preset": "bold",
+        "font": "Easy Amharic Typing",
+        "size": 38,
+        "color": "#FFFFFF",
+        "background": "semi",
+        "backgroundOpacity": 0.65,
+        "position": "bottom",
+        "outline": 2,
+        "outlineColor": "#000000",
+        "highlightWord": true,
+        "animateIn": "up",
+        "animateOut": "fade",
+        "animationSpeed": "normal",
+        "highlightStyle": "default"
+      },
+      "createdAt": "2026-04-26T14:20:00Z",
+      "updatedAt": "2026-04-26T14:25:00Z"
+    },
+    {
+      "id": "proj-2",
+      "userId": "usr-1",
+      "title": "my_vlog.mp4",
+      "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80",
+      "duration": 312,
+      "fileSizeMb": 68.2,
+      "status": "completed",
+      "progress": 100,
+      "captionLanguage": "Amharic",
+      "captionMode": "speech_amharic",
+      "segments": [
+        {
+          "id": "seg-201",
+          "start": 0.8,
+          "end": 4.5,
+          "text": "ሰላም ጤና ይስጥልኝ ጓደኞቼ እንደምን አላችሁ!"
+        },
+        {
+          "id": "seg-202",
+          "start": 5,
+          "end": 9.3,
+          "text": "በዛሬው ቭሎግ በአዲስ አበባ ውብ ስፍራዎች እንዘዋወራለን።"
+        },
+        {
+          "id": "seg-203",
+          "start": 9.8,
+          "end": 14.2,
+          "text": "የኢትዮጵያን ባህላዊ ቡና እና ድንቅ የምግብ ባህል እናያለን።"
+        },
+        {
+          "id": "seg-204",
+          "start": 14.8,
+          "end": 19.5,
+          "text": "አብራችሁን ስላላችሁ ከልብ እናመሰግናለን!"
+        }
+      ],
+      "style": {
+        "preset": "tiktok",
+        "font": "Easy Amharic Typing",
+        "size": 38,
+        "color": "#FFFFFF",
+        "background": "semi",
+        "backgroundOpacity": 0.65,
+        "position": "bottom",
+        "outline": 2,
+        "outlineColor": "#000000",
+        "highlightWord": true,
+        "animateIn": "up",
+        "animateOut": "fade",
+        "animationSpeed": "normal",
+        "highlightStyle": "default"
+      },
+      "createdAt": "2026-04-25T11:10:00Z",
+      "updatedAt": "2026-04-25T11:18:00Z"
+    },
+    {
+      "id": "proj-3",
+      "userId": "usr-1",
+      "title": "presentation.mp4",
+      "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80",
+      "duration": 768,
+      "fileSizeMb": 115,
+      "status": "processing",
+      "progress": 68,
+      "captionLanguage": "Amharic",
+      "captionMode": "speech_amharic",
+      "segments": [
+        {
+          "id": "seg-301",
+          "start": 1,
+          "end": 5,
+          "text": "የአርቴፊሻል ኢንተለጀንስ እድገት በኢትዮጵያ ውስጥ።"
+        },
+        {
+          "id": "seg-302",
+          "start": 5.5,
+          "end": 9.8,
+          "text": "የአማርኛ ቋንቋ ሞዴሎች እና የትርጉም ስራዎች ውጤት።"
+        },
+        {
+          "id": "seg-303",
+          "start": 10.2,
+          "end": 15,
+          "text": "ለሀገራችን ወጣቶች ሰፊ የስራ እድል ይፈጥራል።"
+        },
+        {
+          "id": "seg-304",
+          "start": 15.5,
+          "end": 19.8,
+          "text": "የፈጠራ ስራዎችን በቀላሉ በቪዲዮ ማጋራት ይቻላል።"
+        }
+      ],
+      "style": {
+        "preset": "modern",
+        "font": "Easy Amharic Typing",
+        "size": 38,
+        "color": "#FFFFFF",
+        "background": "semi",
+        "backgroundOpacity": 0.65,
+        "position": "bottom",
+        "outline": 2,
+        "outlineColor": "#000000",
+        "highlightWord": true,
+        "animateIn": "up",
+        "animateOut": "fade",
+        "animationSpeed": "normal",
+        "highlightStyle": "default"
+      },
+      "createdAt": "2026-04-26T15:00:00Z",
+      "updatedAt": "2026-04-26T15:02:00Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-1",
+      "userId": "usr-1",
+      "type": "free_signup",
+      "description": "Free Account Registration Bonus",
+      "minutesChange": 180,
+      "formattedChange": "+03:00",
+      "createdAt": "2026-04-20T10:00:00Z"
+    },
+    {
+      "id": "tx-2",
+      "userId": "usr-1",
+      "type": "payment_package",
+      "description": "Payment (Creator Plan Package #1024)",
+      "minutesChange": 900,
+      "formattedChange": "+15:00",
+      "createdAt": "2026-04-24T12:30:00Z",
+      "referenceId": "pay-1024"
+    },
+    {
+      "id": "tx-3",
+      "userId": "usr-1",
+      "type": "video_deduction",
+      "description": "Video Transcription (video_interview.mp4)",
+      "minutesChange": -154,
+      "formattedChange": "-02:34",
+      "createdAt": "2026-04-25T14:22:00Z",
+      "referenceId": "proj-1"
+    },
+    {
+      "id": "tx-4",
+      "userId": "usr-1",
+      "type": "payment_package",
+      "description": "Payment (Pro Plan Package #1030)",
+      "minutesChange": 3000,
+      "formattedChange": "+50:00",
+      "createdAt": "2026-04-25T16:00:00Z",
+      "referenceId": "pay-1030"
+    },
+    {
+      "id": "tx-5",
+      "userId": "usr-1",
+      "type": "video_deduction",
+      "description": "Video Transcription (my_vlog.mp4)",
+      "minutesChange": -312,
+      "formattedChange": "-05:12",
+      "createdAt": "2026-04-26T09:15:00Z",
+      "referenceId": "proj-2"
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay-1042",
+      "userId": "usr-2",
+      "userName": "Abebe Kebede",
+      "userEmail": "abebe@email.com",
+      "packageId": "creator",
+      "packageName": "Creator (15 min)",
+      "minutes": 15,
+      "amountEtb": 50,
+      "paymentMethod": "Telebirr",
+      "referenceNumber": "TRX-948102834",
+      "receiptUrl": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80",
+      "status": "pending",
+      "submittedAt": "2026-04-26T10:31:00Z"
+    },
+    {
+      "id": "pay-1041",
+      "userId": "usr-5",
+      "userName": "Sara Mohammed",
+      "userEmail": "sara@email.com",
+      "packageId": "starter",
+      "packageName": "Starter (10 min)",
+      "minutes": 10,
+      "amountEtb": 25,
+      "paymentMethod": "Telebirr",
+      "referenceNumber": "TRX-837192837",
+      "receiptUrl": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80",
+      "status": "approved",
+      "submittedAt": "2026-04-26T09:00:00Z",
+      "reviewedAt": "2026-04-26T09:10:00Z"
+    },
+    {
+      "id": "pay-1040",
+      "userId": "usr-4",
+      "userName": "Daniel Abebe",
+      "userEmail": "daniel@email.com",
+      "packageId": "starter",
+      "packageName": "Starter (10 min)",
+      "minutes": 10,
+      "amountEtb": 25,
+      "paymentMethod": "CBE",
+      "referenceNumber": "CBE-481928374",
+      "receiptUrl": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80",
+      "status": "approved",
+      "submittedAt": "2026-04-25T16:20:00Z",
+      "reviewedAt": "2026-04-25T16:30:00Z"
+    },
+    {
+      "id": "pay-1039",
+      "userId": "usr-1",
+      "userName": "Shemsedin Abate",
+      "userEmail": "shemsedin@gmail.com",
+      "packageId": "creator",
+      "packageName": "Creator (15 min)",
+      "minutes": 15,
+      "amountEtb": 50,
+      "paymentMethod": "Telebirr",
+      "referenceNumber": "TRX-726194012",
+      "receiptUrl": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80",
+      "status": "pending",
+      "submittedAt": "2026-04-26T14:45:00Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "notif-1",
+      "userId": "usr-1",
+      "title": "Captions Ready!",
+      "message": "Your video \"video_interview.mp4\" has completed Amharic caption generation.",
+      "time": "10m ago",
+      "read": false,
+      "type": "project"
+    },
+    {
+      "id": "notif-2",
+      "userId": "usr-1",
+      "title": "Welcome Bonus Credited",
+      "message": "3 Free Minutes were successfully added to your balance.",
+      "time": "2d ago",
+      "read": true,
+      "type": "price"
+    },
+    {
+      "id": "notif-3",
+      "userId": "usr-1",
+      "title": "New Feature: TikTok Style",
+      "message": "Try our new high-contrast TikTok and Reels caption styling preset!",
+      "time": "3d ago",
+      "read": true,
+      "type": "system"
+    }
+  ],
+  "settings": {
+    "freeMinutes": 3,
+    "maxUploadMb": 500,
+    "supportedFormats": [
+      "MP4",
+      "MOV",
+      "MKV",
+      "WEBM"
+    ],
+    "telebirrAccount": "+251 911 234 567 (Bgern Media)",
+    "cbeAccount": "1000 4819 2837 4 (Bgern Caption Technologies)",
+    "paymentPlatforms": [
+      {
+        "id": "plat-telebirr",
+        "name": "Telebirr",
+        "accountNumber": "+251 911 234 567",
+        "accountHolder": "Bgern Media Pro",
+        "instructions": "Send transfer via Telebirr app, then enter transaction ID and attach receipt.",
+        "badge": "Instant",
+        "isActive": true
+      },
+      {
+        "id": "plat-cbe",
+        "name": "Commercial Bank of Ethiopia (CBE)",
+        "accountNumber": "1000 4819 2837 4",
+        "accountHolder": "Bgern Caption Technologies PLC",
+        "instructions": "Deposit or mobile bank to CBE 1000 4819 2837 4 and attach deposit slip/screenshot.",
+        "badge": "Popular",
+        "isActive": true
+      },
+      {
+        "id": "plat-awash",
+        "name": "Awash Bank",
+        "accountNumber": "01320491823700",
+        "accountHolder": "Bgern Technologies",
+        "instructions": "Deposit or mobile transfer to Awash Bank account and attach payment confirmation.",
+        "isActive": true
+      },
+      {
+        "id": "plat-abyssinia",
+        "name": "Bank of Abyssinia",
+        "accountNumber": "84729104",
+        "accountHolder": "Bgern Media Studio",
+        "instructions": "Transfer using BoA mobile banking or branch deposit.",
+        "isActive": true
+      }
+    ],
+    "supportedLanguages": [
+      {
+        "id": "amharic",
+        "name": "Amharic",
+        "nativeName": "አማርኛ",
+        "flag": "🇪🇹",
+        "isDefault": true,
+        "enabled": true
+      }
+    ],
+    "packages": [
+      {
+        "id": "starter",
+        "name": "Starter",
+        "minutes": 10,
+        "priceEtb": 25,
+        "popular": false,
+        "features": [
+          "10 minutes processing",
+          "Standard Amharic STT",
+          "SRT & VTT Export",
+          "720p Video Burn"
+        ]
+      },
+      {
+        "id": "creator",
+        "name": "Creator",
+        "minutes": 15,
+        "priceEtb": 50,
+        "popular": true,
+        "features": [
+          "15 minutes processing",
+          "High Accuracy Amharic STT",
+          "All Caption Styles",
+          "1080p Video Burn",
+          "Priority Queue"
+        ]
+      },
+      {
+        "id": "pro",
+        "name": "Pro",
+        "minutes": 50,
+        "priceEtb": 200,
+        "popular": false,
+        "features": [
+          "50 minutes processing",
+          "Maximum STT Accuracy",
+          "Batch Processing",
+          "Watermark-free 1080p",
+          "VIP Support"
+        ]
+      }
+    ],
+    "maintenanceMode": false
+  },
+  "jobs": []
+}
