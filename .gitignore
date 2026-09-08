@@ -1,9 +1,8 @@
 node_modules/
 build/
-dist/
+/dist/
 dist-server/
 dev-dist/
-cpanel-deploy/
 bgern-cpanel.zip
 bgern-cpanel.tar.gz
 repo-bgerncaption/
