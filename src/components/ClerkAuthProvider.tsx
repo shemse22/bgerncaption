@@ -158,6 +158,10 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
       {isConfigured ? (
         <ClerkProvider
           publishableKey={publishableKey}
+          afterSignInUrl="https://bgern.com"
+          afterSignUpUrl="https://bgern.com"
+          signInFallbackRedirectUrl="https://bgern.com"
+          signUpFallbackRedirectUrl="https://bgern.com"
           appearance={{
             variables: {
               colorPrimary: '#9333ea',
