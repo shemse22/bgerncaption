@@ -32,7 +32,7 @@ import {
 import { ThumbnailGeneratorModal } from './ThumbnailGeneratorModal';
 import { SAMPLE_VIDEOS } from '../lib/amharicData';
 
-import { CaptionLanguageOption, VideoAspectRatio, VideoPlatform, CaptionSegment } from '../types';
+import { CaptionLanguageOption, VideoAspectRatio, VideoPlatform, CaptionSegment, SystemSettings } from '../types';
 import { StorageAPI } from '../lib/storage';
 import { TikTokIcon, YouTubeShortsIcon, InstagramIcon, ReelsIcon, FacebookIcon, YouTubeIcon } from './PlatformIcons';
 import { SafeZoneOverlay, SafeZonePlatform } from './SafeZoneOverlay';
@@ -60,6 +60,7 @@ interface UploadModalProps {
   }) => void;
   onOpenWallet: () => void;
   supportedLanguages?: CaptionLanguageOption[];
+  settings?: SystemSettings;
 }
 
 export const UploadModal: React.FC<UploadModalProps> = ({
@@ -72,6 +73,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   onStartGeneration,
   onOpenWallet,
   supportedLanguages,
+  settings,
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(file || null);
   const [videoUrl, setVideoUrl] = useState<string>('');

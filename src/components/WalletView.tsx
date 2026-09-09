@@ -27,6 +27,8 @@ interface WalletViewProps {
   onSubmitReceipt: (payment: PaymentRecord) => void;
   onActivatePackage?: (packageId: 'starter' | 'creator' | 'pro', method?: string) => void;
   settings?: SystemSettings;
+  autoOpenPaymentModal?: boolean;
+  onModalClosed?: () => void;
 }
 
 export const WalletView: React.FC<WalletViewProps> = ({
@@ -35,6 +37,8 @@ export const WalletView: React.FC<WalletViewProps> = ({
   onSubmitReceipt,
   onActivatePackage,
   settings,
+  autoOpenPaymentModal,
+  onModalClosed,
 }) => {
   const [selectedPackage, setSelectedPackage] = useState<PricingPackage | null>(INITIAL_PACKAGES[1]);
   const [referenceNumber, setReferenceNumber] = useState<string>('');
@@ -42,6 +46,14 @@ export const WalletView: React.FC<WalletViewProps> = ({
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
+
+  // Auto-open payment modal when user is redirected from Upload due to insufficient balance
+  React.useEffect(() => {
+    if (autoOpenPaymentModal) {
+      setShowUploadModal(true);
+      onModalClosed?.();
+    }
+  }, [autoOpenPaymentModal]);
 
   // Active payment platforms dynamically configured by Admin
   const activePlatforms: ManualPaymentPlatform[] = React.useMemo(() => {

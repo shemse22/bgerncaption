@@ -34,7 +34,7 @@ interface AdminDashboardProps {
   onApprovePayment: (paymentId: string) => { success: boolean; message: string };
   onRejectPayment: (paymentId: string, reason?: string) => void;
   onAddUserMinutes: (userId: string, minutes: number) => void;
-  onSaveSettings: (settings: SystemSettings) => void;
+  onSaveSettings: (settings: SystemSettings) => Promise<any> | void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
@@ -131,7 +131,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setShowPlatformModal(true);
   };
 
-  const handleSavePlatform = (e: React.FormEvent) => {
+  const handleSavePlatform = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!platformName.trim() || !platformAccountNumber.trim() || !platformAccountHolder.trim()) {
       showToast('error', 'Please fill in the platform name, account number, and account holder.');
@@ -154,7 +154,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }
           : p
       );
-      showToast('success', `Updated ${platformName} payment platform details.`);
     } else {
       const newPlatform: ManualPaymentPlatform = {
         id: `plat-${Date.now().toString(36)}`,
@@ -166,40 +165,62 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         isActive: true,
       };
       updatedList = [...currentList, newPlatform];
-      showToast('success', `Added new manual payment platform: ${platformName}.`);
     }
 
-    onSaveSettings({
-      ...settings,
-      paymentPlatforms: updatedList,
-    });
+    // Synchronize legacy telebirrAccount / cbeAccount fields if those platforms were modified
+    let nextTelebirr = settings.telebirrAccount;
+    let nextCbe = settings.cbeAccount;
+    const telePlat = updatedList.find((p) => p.id === 'plat-telebirr' || p.name.toLowerCase().includes('telebirr'));
+    if (telePlat) nextTelebirr = telePlat.accountNumber;
+    const cbePlat = updatedList.find((p) => p.id === 'plat-cbe' || p.name.toLowerCase().includes('cbe') || p.name.toLowerCase().includes('commercial bank'));
+    if (cbePlat) nextCbe = cbePlat.accountNumber;
+
+    try {
+      await onSaveSettings({
+        ...settings,
+        telebirrAccount: nextTelebirr,
+        cbeAccount: nextCbe,
+        paymentPlatforms: updatedList,
+      });
+      showToast('success', editingPlatformId ? `Updated ${platformName} and saved to database.` : `Added ${platformName} and saved to database.`);
+    } catch (err: any) {
+      showToast('error', `Failed to save to database: ${err?.message || 'Server error'}`);
+    }
     setShowPlatformModal(false);
   };
 
-  const handleTogglePlatform = (platformId: string) => {
+  const handleTogglePlatform = async (platformId: string) => {
     const currentList = settings.paymentPlatforms || INITIAL_PAYMENT_PLATFORMS;
     const updatedList = currentList.map((p) =>
       p.id === platformId ? { ...p, isActive: !p.isActive } : p
     );
-    onSaveSettings({
-      ...settings,
-      paymentPlatforms: updatedList,
-    });
-    showToast('success', 'Payment platform status updated.');
+    try {
+      await onSaveSettings({
+        ...settings,
+        paymentPlatforms: updatedList,
+      });
+      showToast('success', 'Payment platform status updated.');
+    } catch (err: any) {
+      showToast('error', `Failed to update status: ${err?.message || 'Server error'}`);
+    }
   };
 
-  const handleDeletePlatform = (platformId: string, name: string) => {
+  const handleDeletePlatform = async (platformId: string, name: string) => {
     const currentList = settings.paymentPlatforms || INITIAL_PAYMENT_PLATFORMS;
     if (currentList.length <= 1) {
       showToast('error', 'At least one payment platform must remain available.');
       return;
     }
     const updatedList = currentList.filter((p) => p.id !== platformId);
-    onSaveSettings({
-      ...settings,
-      paymentPlatforms: updatedList,
-    });
-    showToast('success', `Deleted platform: ${name}`);
+    try {
+      await onSaveSettings({
+        ...settings,
+        paymentPlatforms: updatedList,
+      });
+      showToast('success', `Deleted platform: ${name}`);
+    } catch (err: any) {
+      showToast('error', `Failed to delete platform: ${err?.message || 'Server error'}`);
+    }
   };
 
   // --- Caption Language Handlers ---
@@ -926,10 +947,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <input
               type="text"
               value={settings.telebirrAccount}
-              onChange={(e) =>
-                onSaveSettings({ ...settings, telebirrAccount: e.target.value })
-              }
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold"
+              onChange={(e) => {
+                const val = e.target.value;
+                const currentPlatforms = settings.paymentPlatforms || INITIAL_PAYMENT_PLATFORMS;
+                const updatedPlatforms = currentPlatforms.map((p) =>
+                  p.id === 'plat-telebirr' || p.name.toLowerCase().includes('telebirr')
+                    ? { ...p, accountNumber: val }
+                    : p
+                );
+                onSaveSettings({
+                  ...settings,
+                  telebirrAccount: val,
+                  paymentPlatforms: updatedPlatforms,
+                });
+              }}
+              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold font-mono"
             />
           </div>
 
@@ -940,10 +972,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <input
               type="text"
               value={settings.cbeAccount}
-              onChange={(e) =>
-                onSaveSettings({ ...settings, cbeAccount: e.target.value })
-              }
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold"
+              onChange={(e) => {
+                const val = e.target.value;
+                const currentPlatforms = settings.paymentPlatforms || INITIAL_PAYMENT_PLATFORMS;
+                const updatedPlatforms = currentPlatforms.map((p) =>
+                  p.id === 'plat-cbe' || p.name.toLowerCase().includes('cbe') || p.name.toLowerCase().includes('commercial bank')
+                    ? { ...p, accountNumber: val }
+                    : p
+                );
+                onSaveSettings({
+                  ...settings,
+                  cbeAccount: val,
+                  paymentPlatforms: updatedPlatforms,
+                });
+              }}
+              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold font-mono"
             />
           </div>
 

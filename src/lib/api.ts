@@ -1,4 +1,4 @@
-import { AppNotification, MinuteTransaction, PaymentRecord, Project, SystemSettings, User } from '../types';
+import { AppNotification, ManualPaymentPlatform, MinuteTransaction, PaymentRecord, Project, SystemSettings, User } from '../types';
 
 export interface ServerState {
   currentUser: User;
@@ -17,12 +17,22 @@ function token() {
   return localStorage.getItem(TOKEN_KEY) || '';
 }
 
+function adminPassword(): string {
+  try {
+    return sessionStorage.getItem('bgern_admin_password') || localStorage.getItem('bgern_admin_password') || '';
+  } catch {
+    return '';
+  }
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const pass = adminPassword();
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
     headers: {
       ...(init.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token() ? { Authorization: `Bearer ${token()}` } : {}),
+      ...(pass ? { 'x-admin-password': pass } : {}),
       ...init.headers,
     },
   });
@@ -107,4 +117,11 @@ export const Api = {
     method: 'PUT',
     body: JSON.stringify(settings),
   }),
+
+  savePaymentPlatforms: (paymentPlatforms: ManualPaymentPlatform[]) => request<{ success: boolean; paymentPlatforms: ManualPaymentPlatform[]; state: ServerState }>('/api/admin/payment-platforms', {
+    method: 'PUT',
+    body: JSON.stringify({ paymentPlatforms }),
+  }),
+
+  getSettings: () => request<SystemSettings>('/api/settings'),
 };

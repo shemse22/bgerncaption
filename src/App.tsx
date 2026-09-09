@@ -68,24 +68,40 @@ export default function App() {
     error?: string;
   } | null>(null);
   const [exportModalProject, setExportModalProject] = useState<Project | null>(null);
+  const [walletAutoOpenModal, setWalletAutoOpenModal] = useState<boolean>(false);
 
   const applyServerState = (state: ServerState) => {
-    const cleanUsers = state.users.filter((u) => !['usr-2', 'usr-3', 'usr-4', 'usr-5', 'usr-6'].includes(u.id));
-    const cleanPayments = state.payments.filter((p) => !['pay-1039', 'pay-1040', 'pay-1041', 'pay-1042'].includes(p.id));
-    setCurrentUser(state.currentUser);
-    setUsers(cleanUsers);
-    setProjects(state.projects);
-    setTransactions(state.transactions);
-    setPayments(cleanPayments);
-    setNotifications(state.notifications);
-    setSettings(state.settings);
-    StorageAPI.setCurrentUser(state.currentUser);
-    StorageAPI.setUsers(cleanUsers);
-    StorageAPI.setProjects(state.projects);
-    StorageAPI.setTransactions(state.transactions);
-    StorageAPI.setPayments(cleanPayments);
-    StorageAPI.setNotifications(state.notifications);
-    StorageAPI.setSettings(state.settings);
+    if (!state) return;
+    if (state.settings) {
+      setSettings(state.settings);
+      StorageAPI.setSettings(state.settings);
+    }
+    if (state.currentUser) {
+      setCurrentUser(state.currentUser);
+      StorageAPI.setCurrentUser(state.currentUser);
+    }
+    if (Array.isArray(state.users)) {
+      const cleanUsers = state.users.filter((u) => !['usr-2', 'usr-3', 'usr-4', 'usr-5', 'usr-6'].includes(u.id));
+      setUsers(cleanUsers);
+      StorageAPI.setUsers(cleanUsers);
+    }
+    if (Array.isArray(state.projects)) {
+      setProjects(state.projects);
+      StorageAPI.setProjects(state.projects);
+    }
+    if (Array.isArray(state.transactions)) {
+      setTransactions(state.transactions);
+      StorageAPI.setTransactions(state.transactions);
+    }
+    if (Array.isArray(state.payments)) {
+      const cleanPayments = state.payments.filter((p) => !['pay-1039', 'pay-1040', 'pay-1041', 'pay-1042'].includes(p.id));
+      setPayments(cleanPayments);
+      StorageAPI.setPayments(cleanPayments);
+    }
+    if (Array.isArray(state.notifications)) {
+      setNotifications(state.notifications);
+      StorageAPI.setNotifications(state.notifications);
+    }
   };
 
   // Sync theme to document element
@@ -94,6 +110,17 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
+    // 1. Immediately fetch public server settings so ALL users (guests & creators) get live bank accounts
+    Api.getSettings()
+      .then((liveSettings) => {
+        if (liveSettings && Array.isArray(liveSettings.paymentPlatforms)) {
+          setSettings(liveSettings);
+          StorageAPI.setSettings(liveSettings);
+        }
+      })
+      .catch((err) => console.warn('Could not fetch server settings:', err));
+
+    // 2. Fetch session (returns public state even for guests)
     Api.session().then(applyServerState).catch(() => undefined);
   }, []);
 
@@ -590,6 +617,21 @@ export default function App() {
 
   const currentProject = projects.find((p) => p.id === activeProjectId) || visibleProjects[0] || projects[0];
 
+  const handleSaveSettings = async (nextSettings: SystemSettings) => {
+    setSettings(nextSettings);
+    StorageAPI.setSettings(nextSettings);
+    try {
+      const updatedState = await Api.saveSettings(nextSettings);
+      if (updatedState) {
+        applyServerState(updatedState);
+      }
+      return true;
+    } catch (err) {
+      console.error('Failed to save settings to server:', err);
+      throw err;
+    }
+  };
+
   if (isStandaloneAdmin) {
     return <AdminPage
       users={users}
@@ -598,11 +640,7 @@ export default function App() {
       onApprovePayment={handleApprovePayment}
       onRejectPayment={handleRejectPayment}
       onAddUserMinutes={handleAddUserMinutes}
-      onSaveSettings={(nextSettings) => {
-        setSettings(nextSettings);
-        StorageAPI.setSettings(nextSettings);
-        void Api.saveSettings(nextSettings).then(applyServerState).catch(() => undefined);
-      }}
+      onSaveSettings={handleSaveSettings}
     />;
   }
 
@@ -680,9 +718,11 @@ export default function App() {
               onBack={() => setViewMode('main')}
               onStartGeneration={handleStartGeneration}
               onOpenWallet={() => {
+                setWalletAutoOpenModal(true);
                 setViewMode('main');
                 setActiveTab('price');
               }}
+              settings={settings}
             />
           )}
 
@@ -748,6 +788,8 @@ export default function App() {
                   onSubmitReceipt={handleSubmitReceipt}
                   onActivatePackage={handleActivatePackage}
                   settings={settings}
+                  autoOpenPaymentModal={walletAutoOpenModal}
+                  onModalClosed={() => setWalletAutoOpenModal(false)}
                 />
               )}
 
@@ -796,11 +838,7 @@ export default function App() {
                   onApprovePayment={handleApprovePayment}
                   onRejectPayment={handleRejectPayment}
                   onAddUserMinutes={handleAddUserMinutes}
-                  onSaveSettings={(s) => {
-                    setSettings(s);
-                    StorageAPI.setSettings(s);
-                    void Api.saveSettings(s).then(applyServerState).catch(() => undefined);
-                  }}
+                  onSaveSettings={handleSaveSettings}
                 />
               )}
             </>

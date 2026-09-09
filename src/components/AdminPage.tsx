@@ -103,8 +103,10 @@ export const AdminPage: React.FC<AdminPageProps> = (props) => {
       if (isUsernameMatch && isEmailMatch && isPasswordMatch) {
         sessionStorage.setItem(ADMIN_AUTH_SESSION_KEY, 'true');
         sessionStorage.setItem('bgern_admin_username', username.trim() || 'admin');
+        sessionStorage.setItem('bgern_admin_password', inputPass);
         if (rememberMe) {
           localStorage.setItem(ADMIN_AUTH_REMEMBER_KEY, 'true');
+          localStorage.setItem('bgern_admin_password', inputPass);
         }
         setAuthenticatedUser(username.trim() || 'admin');
         setIsAuthenticated(true);
@@ -120,11 +122,30 @@ export const AdminPage: React.FC<AdminPageProps> = (props) => {
     }
   };
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      const savedPass =
+        sessionStorage.getItem('bgern_admin_password') ||
+        localStorage.getItem('bgern_admin_password') ||
+        validPassword;
+      if (savedPass) {
+        sessionStorage.setItem('bgern_admin_password', savedPass);
+        Api.adminLogin({
+          username: authenticatedUser || validUsername,
+          email: validEmail,
+          password: savedPass,
+        }).catch(() => undefined);
+      }
+    }
+  }, [isAuthenticated, authenticatedUser, validUsername, validEmail, validPassword]);
+
   const handleLogout = () => {
     try {
       sessionStorage.removeItem(ADMIN_AUTH_SESSION_KEY);
       sessionStorage.removeItem('bgern_admin_username');
+      sessionStorage.removeItem('bgern_admin_password');
       localStorage.removeItem(ADMIN_AUTH_REMEMBER_KEY);
+      localStorage.removeItem('bgern_admin_password');
     } catch {
       // ignore
     }
