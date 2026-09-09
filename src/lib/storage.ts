@@ -40,56 +40,6 @@ export const INITIAL_CURRENT_USER: User = {
 
 export const INITIAL_USERS: User[] = [
   INITIAL_CURRENT_USER,
-  {
-    id: 'usr-2',
-    name: 'Abebe Kebede',
-    email: 'abebe@email.com',
-    role: 'user',
-    availableMinutes: 742, // 12:22
-    plan: 'creator',
-    status: 'active',
-    createdAt: '2026-04-18T09:30:00Z',
-  },
-  {
-    id: 'usr-3',
-    name: 'Hana Tesfaye',
-    email: 'hana@email.com',
-    role: 'user',
-    availableMinutes: 3000, // 50:00
-    plan: 'pro',
-    status: 'active',
-    createdAt: '2026-04-15T14:10:00Z',
-  },
-  {
-    id: 'usr-4',
-    name: 'Dawit Alemu',
-    email: 'dawit@email.com',
-    role: 'user',
-    availableMinutes: 0,
-    plan: 'free',
-    status: 'active',
-    createdAt: '2026-04-19T11:00:00Z',
-  },
-  {
-    id: 'usr-5',
-    name: 'Sara Mohammed',
-    email: 'sara@email.com',
-    role: 'user',
-    availableMinutes: 180,
-    plan: 'starter',
-    status: 'active',
-    createdAt: '2026-04-21T08:00:00Z',
-  },
-  {
-    id: 'usr-6',
-    name: 'Michael Brown',
-    email: 'michael@email.com',
-    role: 'user',
-    availableMinutes: 1000,
-    plan: 'free',
-    status: 'suspended',
-    createdAt: '2026-04-10T12:00:00Z',
-  },
 ];
 
 export const INITIAL_PROJECTS: Project[] = [
@@ -198,70 +148,7 @@ export const INITIAL_TRANSACTIONS: MinuteTransaction[] = [
   },
 ];
 
-export const INITIAL_PAYMENTS: PaymentRecord[] = [
-  {
-    id: 'pay-1042',
-    userId: 'usr-2',
-    userName: 'Abebe Kebede',
-    userEmail: 'abebe@email.com',
-    packageId: 'creator',
-    packageName: 'Creator (15 min)',
-    minutes: 15,
-    amountEtb: 50,
-    paymentMethod: 'Telebirr',
-    referenceNumber: 'TRX-948102834',
-    receiptUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
-    status: 'pending',
-    submittedAt: '2026-04-26T10:31:00Z',
-  },
-  {
-    id: 'pay-1041',
-    userId: 'usr-5',
-    userName: 'Sara Mohammed',
-    userEmail: 'sara@email.com',
-    packageId: 'starter',
-    packageName: 'Starter (10 min)',
-    minutes: 10,
-    amountEtb: 25,
-    paymentMethod: 'Telebirr',
-    referenceNumber: 'TRX-837192837',
-    receiptUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
-    status: 'approved',
-    submittedAt: '2026-04-26T09:00:00Z',
-    reviewedAt: '2026-04-26T09:10:00Z',
-  },
-  {
-    id: 'pay-1040',
-    userId: 'usr-4',
-    userName: 'Daniel Abebe',
-    userEmail: 'daniel@email.com',
-    packageId: 'starter',
-    packageName: 'Starter (10 min)',
-    minutes: 10,
-    amountEtb: 25,
-    paymentMethod: 'CBE',
-    referenceNumber: 'CBE-481928374',
-    receiptUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
-    status: 'approved',
-    submittedAt: '2026-04-25T16:20:00Z',
-    reviewedAt: '2026-04-25T16:30:00Z',
-  },
-  {
-    id: 'pay-1039',
-    userId: 'usr-1',
-    userName: 'Shemsedin Abate',
-    userEmail: 'shemsedin@gmail.com',
-    packageId: 'creator',
-    packageName: 'Creator (15 min)',
-    minutes: 15,
-    amountEtb: 50,
-    paymentMethod: 'Telebirr',
-    referenceNumber: 'TRX-726194012',
-    receiptUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&auto=format&fit=crop&q=80',
-    status: 'pending',
-    submittedAt: '2026-04-26T14:45:00Z',
-  },
-];
+export const INITIAL_PAYMENTS: PaymentRecord[] = [];
 
 export const INITIAL_NOTIFICATIONS: AppNotification[] = [
   {

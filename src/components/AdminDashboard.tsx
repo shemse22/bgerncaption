@@ -73,11 +73,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [langNativeName, setLangNativeName] = useState<string>('');
   const [langFlag, setLangFlag] = useState<string>('🇪🇹');
 
-  // Stats calculation
+  // Stats calculation (Real data calculated from payments and users)
   const pendingPayments = payments.filter((p) => p.status === 'pending');
   const approvedPayments = payments.filter((p) => p.status === 'approved');
-  const totalRevenue = approvedPayments.reduce((sum, p) => sum + p.amountEtb, 0) + 145000;
-  const totalMinutesSold = approvedPayments.reduce((sum, p) => sum + p.minutes, 0) + 42000;
+  const totalRevenue = approvedPayments.reduce((sum, p) => sum + p.amountEtb, 0);
+  const totalMinutesSold = approvedPayments.reduce((sum, p) => sum + p.minutes, 0);
 
   const showToast = (type: 'success' | 'error', text: string) => {
     setToastMessage({ type, text });
@@ -302,15 +302,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       </div>
 
-      {/* Stats Cards Row (Image 2 screen 3) */}
+      {/* Stats Cards Row (100% Real Live Metrics) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
           <div className="flex items-center justify-between text-slate-400">
             <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Total Users</span>
             <Users className="w-4 h-4 text-blue-600" />
           </div>
-          <div className="text-xl sm:text-2xl font-black text-slate-900">{users.length + 1280}</div>
-          <p className="text-[10px] text-emerald-600 font-semibold">+12% this week</p>
+          <div className="text-xl sm:text-2xl font-black text-slate-900">{users.length}</div>
+          <p className="text-[10px] text-slate-500 font-medium">
+            {users.filter((u) => u.status === 'active').length} active creators
+          </p>
         </div>
 
         <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
@@ -319,7 +321,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <Clock className="w-4 h-4 text-indigo-600" />
           </div>
           <div className="text-xl sm:text-2xl font-black text-slate-900">{totalMinutesSold.toLocaleString()}</div>
-          <p className="text-[10px] text-slate-400 font-medium">Transcription credits</p>
+          <p className="text-[10px] text-slate-400 font-medium">
+            {approvedPayments.length} package orders
+          </p>
         </div>
 
         <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
@@ -328,7 +332,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <CreditCard className="w-4 h-4 text-amber-500" />
           </div>
           <div className="text-xl sm:text-2xl font-black text-amber-600">{pendingPayments.length}</div>
-          <p className="text-[10px] text-amber-600 font-semibold">Requires action</p>
+          <p className="text-[10px] text-amber-600 font-semibold">
+            {pendingPayments.length > 0 ? `${pendingPayments.length} requires action` : 'All caught up'}
+          </p>
         </div>
 
         <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
