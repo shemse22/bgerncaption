@@ -51,9 +51,11 @@
   }
 }
 
-html {
+html, body {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {

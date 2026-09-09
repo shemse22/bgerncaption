@@ -163,7 +163,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white selection:bg-purple-500 selection:text-white pb-20 md:pb-12">
       {/* 1. HERO SECTION */}
-      <section id="top" className="relative overflow-hidden pt-6 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 border-b border-slate-800/80">
+      <section id="top" className="relative overflow-hidden pt-6 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 border-b border-slate-800/80" style={{contain: 'paint'}}>
         {/* Atmospheric ambient glow spheres */}
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute top-[20%] right-[-5%] w-[450px] h-[450px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
