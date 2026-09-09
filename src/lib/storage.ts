@@ -294,8 +294,14 @@ export const StorageAPI = {
   },
   setCurrentUser: (user: User) => saveToStorage(CURRENT_USER_KEY, user),
 
-  getUsers: (): User[] => loadFromStorage<User[]>(USERS_KEY, [INITIAL_CURRENT_USER]),
-  setUsers: (users: User[]) => saveToStorage(USERS_KEY, users),
+  getUsers: (): User[] => {
+    const list = loadFromStorage<User[]>(USERS_KEY, [INITIAL_CURRENT_USER]);
+    return list.filter((u) => !['usr-2', 'usr-3', 'usr-4', 'usr-5', 'usr-6'].includes(u.id));
+  },
+  setUsers: (users: User[]) => {
+    const clean = users.filter((u) => !['usr-2', 'usr-3', 'usr-4', 'usr-5', 'usr-6'].includes(u.id));
+    saveToStorage(USERS_KEY, clean);
+  },
 
   getProjects: (): Project[] => loadFromStorage<Project[]>(PROJECTS_KEY, []),
   setProjects: (projects: Project[]) => saveToStorage(PROJECTS_KEY, projects),
@@ -473,8 +479,14 @@ export const StorageAPI = {
     return { user: updatedCurrentUser, message: `Activated ${pkg.name} package (${pkg.minutes} min).` };
   },
 
-  getPayments: (): PaymentRecord[] => loadFromStorage<PaymentRecord[]>(PAYMENTS_KEY, []),
-  setPayments: (payments: PaymentRecord[]) => saveToStorage(PAYMENTS_KEY, payments),
+  getPayments: (): PaymentRecord[] => {
+    const list = loadFromStorage<PaymentRecord[]>(PAYMENTS_KEY, []);
+    return list.filter((p) => !['pay-1039', 'pay-1040', 'pay-1041', 'pay-1042'].includes(p.id));
+  },
+  setPayments: (payments: PaymentRecord[]) => {
+    const clean = payments.filter((p) => !['pay-1039', 'pay-1040', 'pay-1041', 'pay-1042'].includes(p.id));
+    saveToStorage(PAYMENTS_KEY, clean);
+  },
   addPayment: (payment: PaymentRecord) => {
     const all = StorageAPI.getPayments();
     const updated = [payment, ...all];

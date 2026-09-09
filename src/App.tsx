@@ -70,18 +70,20 @@ export default function App() {
   const [exportModalProject, setExportModalProject] = useState<Project | null>(null);
 
   const applyServerState = (state: ServerState) => {
+    const cleanUsers = state.users.filter((u) => !['usr-2', 'usr-3', 'usr-4', 'usr-5', 'usr-6'].includes(u.id));
+    const cleanPayments = state.payments.filter((p) => !['pay-1039', 'pay-1040', 'pay-1041', 'pay-1042'].includes(p.id));
     setCurrentUser(state.currentUser);
-    setUsers(state.users);
+    setUsers(cleanUsers);
     setProjects(state.projects);
     setTransactions(state.transactions);
-    setPayments(state.payments);
+    setPayments(cleanPayments);
     setNotifications(state.notifications);
     setSettings(state.settings);
     StorageAPI.setCurrentUser(state.currentUser);
-    StorageAPI.setUsers(state.users);
+    StorageAPI.setUsers(cleanUsers);
     StorageAPI.setProjects(state.projects);
     StorageAPI.setTransactions(state.transactions);
-    StorageAPI.setPayments(state.payments);
+    StorageAPI.setPayments(cleanPayments);
     StorageAPI.setNotifications(state.notifications);
     StorageAPI.setSettings(state.settings);
   };

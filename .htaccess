@@ -10,10 +10,9 @@
   # RewriteCond %{HTTPS} off
   # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-  # 2. Proxy API requests to Node.js backend (if running Node.js as separate service)
-  # Uncomment the following two lines if Node.js is running on port 8787 on localhost:
-  # RewriteCond %{REQUEST_URI} ^/api/ [NC]
-  # RewriteRule ^api/(.*)$ http://127.0.0.1:8787/api/$1 [P,L]
+  # 2. Proxy API requests to Node.js backend
+  RewriteCond %{REQUEST_URI} ^/api/ [NC]
+  RewriteRule ^api/(.*)$ http://127.0.0.1:8787/api/$1 [P,L]
 
   # 3. Single Page Application (SPA) routing for React / Vite
   RewriteRule ^index\.html$ - [L]
