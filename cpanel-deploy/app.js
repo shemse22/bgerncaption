@@ -74077,6 +74077,14 @@ var SAMPLE_VIDEOS = [
 ];
 
 // src/lib/storage.ts
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+  try {
+    ["amharic_caption_users_v2", "amharic_caption_payments_v2", "amharic_caption_transactions_v2", "amharic_caption_notifications_v2", "amharic_caption_projects_v2"].forEach(
+      (k) => localStorage.removeItem(k)
+    );
+  } catch {
+  }
+}
 var INITIAL_CURRENT_USER = {
   id: "usr-1",
   name: "Shemsedin Abate",

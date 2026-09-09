@@ -11,13 +11,24 @@ import {
 } from '../types';
 import { DEFAULT_STYLE, INITIAL_PACKAGES, SAMPLE_VIDEOS } from './amharicData';
 
-const CURRENT_USER_KEY = 'amharic_caption_current_user_v2';
-const USERS_KEY = 'amharic_caption_users_v2';
-const PROJECTS_KEY = 'amharic_caption_projects_v2';
-const TRANSACTIONS_KEY = 'amharic_caption_transactions_v2';
-const PAYMENTS_KEY = 'amharic_caption_payments_v2';
-const NOTIFICATIONS_KEY = 'amharic_caption_notifications_v2';
-const SETTINGS_KEY = 'amharic_caption_settings_v2';
+const CURRENT_USER_KEY = 'amharic_caption_current_user_v3';
+const USERS_KEY = 'amharic_caption_users_v3';
+const PROJECTS_KEY = 'amharic_caption_projects_v3';
+const TRANSACTIONS_KEY = 'amharic_caption_transactions_v3';
+const PAYMENTS_KEY = 'amharic_caption_payments_v3';
+const NOTIFICATIONS_KEY = 'amharic_caption_notifications_v3';
+const SETTINGS_KEY = 'amharic_caption_settings_v3';
+
+// Automatically purge legacy mock data from previous versions
+if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+  try {
+    ['amharic_caption_users_v2', 'amharic_caption_payments_v2', 'amharic_caption_transactions_v2', 'amharic_caption_notifications_v2', 'amharic_caption_projects_v2'].forEach(
+      (k) => localStorage.removeItem(k)
+    );
+  } catch {
+    // ignore
+  }
+}
 
 export const INITIAL_CURRENT_USER: User = {
   id: 'usr-1',

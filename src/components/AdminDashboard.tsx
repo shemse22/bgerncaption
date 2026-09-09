@@ -47,6 +47,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onSaveSettings,
 }) => {
   const [activeTab, setActiveTab] = useState<'approvals' | 'users' | 'platforms' | 'languages' | 'settings'>('approvals');
+  const [showMetrics, setShowMetrics] = useState<boolean>(true);
   const [paymentFilter, setPaymentFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
   const [userSearch, setUserSearch] = useState<string>('');
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
@@ -288,7 +289,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-black text-slate-900">Admin Control Panel</h1>
@@ -300,54 +301,64 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             Approve manual Telebirr/CBE payments and manage user credit balances
           </p>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setShowMetrics(!showMetrics)}
+          className="shrink-0 text-xs font-bold text-slate-500 hover:text-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition shadow-2xs touch-tap"
+        >
+          {showMetrics ? '✕ Hide Overview' : '+ Show Overview'}
+        </button>
       </div>
 
       {/* Stats Cards Row (100% Real Live Metrics) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Total Users</span>
-            <Users className="w-4 h-4 text-blue-600" />
+      {showMetrics && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Total Users</span>
+              <Users className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-slate-900">{users.length}</div>
+            <p className="text-[10px] text-slate-500 font-medium">
+              {users.filter((u) => u.status === 'active').length} active accounts
+            </p>
           </div>
-          <div className="text-xl sm:text-2xl font-black text-slate-900">{users.length}</div>
-          <p className="text-[10px] text-slate-500 font-medium">
-            {users.filter((u) => u.status === 'active').length} active creators
-          </p>
-        </div>
 
-        <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Minutes Sold</span>
-            <Clock className="w-4 h-4 text-indigo-600" />
+          <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Minutes Sold</span>
+              <Clock className="w-4 h-4 text-indigo-600" />
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-slate-900">{totalMinutesSold.toLocaleString()}</div>
+            <p className="text-[10px] text-slate-400 font-medium">
+              {approvedPayments.length} package orders
+            </p>
           </div>
-          <div className="text-xl sm:text-2xl font-black text-slate-900">{totalMinutesSold.toLocaleString()}</div>
-          <p className="text-[10px] text-slate-400 font-medium">
-            {approvedPayments.length} package orders
-          </p>
-        </div>
 
-        <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Pending Approvals</span>
-            <CreditCard className="w-4 h-4 text-amber-500" />
+          <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Pending Approvals</span>
+              <CreditCard className="w-4 h-4 text-amber-500" />
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-amber-600">{pendingPayments.length}</div>
+            <p className="text-[10px] text-amber-600 font-semibold">
+              {pendingPayments.length > 0 ? `${pendingPayments.length} requires action` : 'All caught up'}
+            </p>
           </div>
-          <div className="text-xl sm:text-2xl font-black text-amber-600">{pendingPayments.length}</div>
-          <p className="text-[10px] text-amber-600 font-semibold">
-            {pendingPayments.length > 0 ? `${pendingPayments.length} requires action` : 'All caught up'}
-          </p>
-        </div>
 
-        <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Total Revenue</span>
-            <DollarSign className="w-4 h-4 text-emerald-600" />
+          <div className="rounded-3xl bg-white p-3.5 sm:p-4 border border-slate-100 shadow-xs space-y-1">
+            <div className="flex items-center justify-between text-slate-400">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Total Revenue</span>
+              <DollarSign className="w-4 h-4 text-emerald-600" />
+            </div>
+            <div className="text-xl sm:text-2xl font-black text-emerald-600 font-mono">
+              {totalRevenue.toLocaleString()} ETB
+            </div>
+            <p className="text-[10px] text-slate-400 font-medium">Verified payments</p>
           </div>
-          <div className="text-xl sm:text-2xl font-black text-emerald-600 font-mono">
-            {totalRevenue.toLocaleString()} ETB
-          </div>
-          <p className="text-[10px] text-slate-400 font-medium">Verified payments</p>
         </div>
-      </div>
+      )}
 
       {/* Tabs */}
       <div className="flex items-center gap-2 border-b border-slate-200 overflow-x-auto">
