@@ -52,6 +52,17 @@ export const Api = {
     return payload;
   },
 
+  async adminLogin(credentials: { username: string; email: string; password: string }): Promise<ServerState & { token: string }> {
+    const payload = await request<{ success: boolean; token: string; user: User; state: ServerState }>('/api/admin/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+    if (payload.token) {
+      localStorage.setItem(TOKEN_KEY, payload.token);
+    }
+    return { ...payload.state, token: payload.token };
+  },
+
   logout: () => {
     localStorage.removeItem(TOKEN_KEY);
   },

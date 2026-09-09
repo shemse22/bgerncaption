@@ -351,6 +351,9 @@ export const INITIAL_SETTINGS: SystemSettings = {
   supportedLanguages: INITIAL_LANGUAGES,
   packages: INITIAL_PACKAGES,
   maintenanceMode: false,
+  adminUsername: 'admin',
+  adminEmail: 'thebigel16@gmail.com',
+  adminPassword: 'bgern@2026',
 };
 
 // Storage Helpers

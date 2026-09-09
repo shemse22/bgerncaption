@@ -930,6 +930,58 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             />
           </div>
 
+          {/* Admin Security & Credentials */}
+          <div className="pt-3 border-t border-slate-100 space-y-3">
+            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-blue-600">
+              <ShieldCheck className="w-3.5 h-3.5" /> Admin Portal Security Credentials
+            </h4>
+            <p className="text-[11px] text-slate-500">
+              These credentials protect access to this Admin Console at <code className="px-1 py-0.5 rounded bg-slate-100 font-mono">/admin</code>.
+            </p>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">
+                Admin Username
+              </label>
+              <input
+                type="text"
+                value={settings.adminUsername || 'admin'}
+                onChange={(e) =>
+                  onSaveSettings({ ...settings, adminUsername: e.target.value })
+                }
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">
+                Admin Email
+              </label>
+              <input
+                type="email"
+                value={settings.adminEmail || 'thebigel16@gmail.com'}
+                onChange={(e) =>
+                  onSaveSettings({ ...settings, adminEmail: e.target.value })
+                }
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">
+                Admin Password
+              </label>
+              <input
+                type="text"
+                value={settings.adminPassword || 'bgern@2026'}
+                onChange={(e) =>
+                  onSaveSettings({ ...settings, adminPassword: e.target.value })
+                }
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold font-mono"
+              />
+            </div>
+          </div>
+
           <div className="pt-2">
             <button
               onClick={() => showToast('success', 'System settings saved successfully.')}

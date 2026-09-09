@@ -74411,7 +74411,10 @@ var INITIAL_SETTINGS = {
   paymentPlatforms: INITIAL_PAYMENT_PLATFORMS,
   supportedLanguages: INITIAL_LANGUAGES,
   packages: INITIAL_PACKAGES,
-  maintenanceMode: false
+  maintenanceMode: false,
+  adminUsername: "admin",
+  adminEmail: "thebigel16@gmail.com",
+  adminPassword: "bgern@2026"
 };
 
 // server.ts
@@ -74762,6 +74765,40 @@ app.post("/api/auth/clerk", async (req, res) => {
     await writeDb(db);
   }
   res.json({ token: signSession(user.id), ...await publicState(user) });
+});
+app.post("/api/admin/login", async (req, res) => {
+  const username = String(req.body?.username || "").trim().toLowerCase();
+  const email = String(req.body?.email || "").trim().toLowerCase();
+  const password = String(req.body?.password || "");
+  const db = await readDb();
+  const validUsernames = /* @__PURE__ */ new Set([
+    (process.env.ADMIN_USERNAME || db.settings.adminUsername || "admin").toLowerCase(),
+    "admin",
+    "shemse",
+    "shemse22"
+  ]);
+  const validEmail = (process.env.ADMIN_EMAIL || db.settings.adminEmail || "thebigel16@gmail.com").toLowerCase();
+  const validPassword = process.env.ADMIN_PASSWORD || db.settings.adminPassword || "bgern@2026";
+  const isEmailValid = adminEmails.has(email) || email === validEmail;
+  const isUsernameValid = validUsernames.has(username);
+  const isPasswordValid = password === validPassword;
+  if (isUsernameValid && isEmailValid && isPasswordValid) {
+    let admin = db.users.find((u) => u.email.toLowerCase() === email && u.role === "admin");
+    if (!admin) {
+      admin = {
+        ...INITIAL_CURRENT_USER,
+        email,
+        name: req.body?.username || "Administrator",
+        role: "admin"
+      };
+      db.users = [admin, ...db.users.filter((u) => u.id !== admin.id)];
+      await writeDb(db);
+    }
+    const token = signSession(admin.id);
+    const state = await publicState(admin);
+    return res.json({ success: true, token, user: admin, state });
+  }
+  return res.status(401).json({ error: "Invalid admin username, email, or password." });
 });
 app.get("/api/session", async (req, res) => {
   const user = await currentUser(req);

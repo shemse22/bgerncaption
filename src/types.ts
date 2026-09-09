@@ -173,4 +173,7 @@ export interface SystemSettings {
   supportedLanguages: CaptionLanguageOption[];
   packages: PricingPackage[];
   maintenanceMode: boolean;
+  adminUsername?: string;
+  adminEmail?: string;
+  adminPassword?: string;
 }
