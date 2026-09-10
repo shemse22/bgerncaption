@@ -741,8 +741,8 @@ app.post('/api/transcriptions', async (req: Request, res: Response) => {
   const user = await requireUser(req, res);
   if (!user) return;
   const db = await readDb();
-  const apiKey = req.header('x-gemini-key') || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || db.settings?.geminiApiKey;
-  const geminiModel = process.env.GEMINI_MODEL || db.settings?.geminiModel || 'gemini-1.5-pro';
+  const apiKey = req.header('x-gemini-key') || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || db.settings?.geminiApiKey || INITIAL_SETTINGS.geminiApiKey;
+  const geminiModel = process.env.GEMINI_MODEL || db.settings?.geminiModel || INITIAL_SETTINGS.geminiModel || 'gemini-1.5-pro';
   const body = req.body as Buffer | undefined;
   const mimeType = req.header('content-type')?.split(';')[0] || 'video/mp4';
   const mode = req.header('x-caption-mode') === 'translate_amharic' ? 'translate_amharic' : 'speech_amharic';

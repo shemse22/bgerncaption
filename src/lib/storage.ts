@@ -252,6 +252,8 @@ export const INITIAL_SETTINGS: SystemSettings = {
   adminUsername: 'admin',
   adminEmail: 'thebigel16@gmail.com',
   adminPassword: 'bgern@2026',
+  geminiApiKey: '',
+  geminiModel: 'gemini-1.5-pro',
 };
 
 // Storage Helpers
@@ -599,6 +601,8 @@ export const StorageAPI = {
     return {
       ...INITIAL_SETTINGS,
       ...saved,
+      geminiApiKey: saved.geminiApiKey || INITIAL_SETTINGS.geminiApiKey,
+      geminiModel: saved.geminiModel || INITIAL_SETTINGS.geminiModel || 'gemini-1.5-pro',
       paymentPlatforms:
         saved.paymentPlatforms && saved.paymentPlatforms.length > 0
           ? saved.paymentPlatforms
