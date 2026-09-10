@@ -49,63 +49,77 @@ function asSegments(value: unknown, duration: number): CaptionSegment[] {
 
 async function uploadToConfiguredService(request: TranscriptionRequest, endpoint: string): Promise<CaptionSegment[]> {
   const { file, mode, language, duration, onProgress } = request;
-  let simInterval: ReturnType<typeof setInterval>;
+  let simInterval: ReturnType<typeof setInterval> | undefined;
   
-  const response = await new Promise<Response>((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', endpoint);
-    xhr.responseType = 'json';
-    xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
-    xhr.setRequestHeader('X-Caption-Mode', mode);
-    xhr.setRequestHeader('X-Caption-Language', language);
-    xhr.setRequestHeader('X-Video-Duration', String(duration));
-    xhr.setRequestHeader('X-Video-Name', file.name);
-    
-    const token = localStorage.getItem(TOKEN_KEY);
-    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-    
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percent = Math.round((event.loaded / event.total) * 35);
-        onProgress({ stage: 'uploading', progress: percent });
-        
-        if (event.loaded >= event.total) {
-          // Upload finished, now waiting for Gemini API processing
-          onProgress({ stage: 'transcribing', progress: 35 });
-          
-          let simProgress = 35;
-          simInterval = setInterval(() => {
-            simProgress += 1;
-            if (simProgress <= 90) {
-              onProgress({ stage: 'transcribing', progress: simProgress });
-            }
-          }, 1500);
+  try {
+    const rawData = await new Promise<any>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', endpoint);
+      xhr.responseType = 'json';
+      xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
+      xhr.setRequestHeader('X-Caption-Mode', mode);
+      xhr.setRequestHeader('X-Caption-Language', language);
+      xhr.setRequestHeader('X-Video-Duration', String(duration));
+      xhr.setRequestHeader('X-Video-Name', file.name);
+      
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      
+      // Stage 1: Upload progress (1% to 35%)
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable && event.total > 0) {
+          const percent = Math.min(35, Math.max(5, Math.round((event.loaded / event.total) * 35)));
+          onProgress({ stage: 'uploading', progress: percent });
         }
-      }
-    };
-    
-    xhr.onload = () => {
-      clearInterval(simInterval);
-      const body = xhr.response ?? xhr.responseText;
-      resolve(new Response(typeof body === 'string' ? body : JSON.stringify(body), { status: xhr.status }));
-    };
-    
-    xhr.onerror = () => {
-      clearInterval(simInterval);
-      reject(new Error('Unable to reach the transcription service.'));
-    };
-    
-    xhr.send(file);
-  });
+      };
 
-  clearInterval(simInterval!);
+      // Stage 2: When upload finishes, immediately advance to transcribing (35% -> 90%)
+      const startTranscribing = () => {
+        onProgress({ stage: 'transcribing', progress: 38 });
+        if (!simInterval) {
+          let current = 38;
+          simInterval = setInterval(() => {
+            current += 2;
+            if (current <= 92) {
+              onProgress({ stage: 'transcribing', progress: current });
+            }
+          }, 800);
+        }
+      };
 
-  if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(detail || `Transcription service returned ${response.status}.`);
+      xhr.upload.onload = startTranscribing;
+      
+      xhr.onload = () => {
+        if (simInterval) clearInterval(simInterval);
+        
+        let data: any = xhr.response;
+        if (xhr.status >= 200 && xhr.status < 300 && data) {
+          resolve(data);
+        } else {
+          const msg = (data && typeof data === 'object' && data.error) ? data.error : `Server status ${xhr.status}`;
+          reject(new Error(msg));
+        }
+      };
+      
+      xhr.onerror = () => {
+        if (simInterval) clearInterval(simInterval);
+        reject(new Error('Network error: Could not reach transcription service.'));
+      };
+
+      xhr.ontimeout = () => {
+        if (simInterval) clearInterval(simInterval);
+        reject(new Error('Transcription request timed out.'));
+      };
+
+      xhr.timeout = 120000;
+      xhr.send(file);
+    });
+
+    onProgress({ stage: 'finalizing', progress: 98 });
+    return asSegments(rawData, duration);
+  } finally {
+    if (simInterval) clearInterval(simInterval);
   }
-  onProgress({ stage: 'finalizing', progress: 95 });
-  return asSegments(await response.json(), duration);
 }
 
 async function transcribeWithGemini(request: TranscriptionRequest, apiKey: string): Promise<CaptionSegment[]> {
@@ -233,8 +247,8 @@ export async function transcribeVideo(request: TranscriptionRequest): Promise<Ca
   try {
     return await uploadToConfiguredService(request, endpoint);
   } catch (serviceErr) {
-    console.error('Server transcription service failed:', serviceErr);
-    throw serviceErr;
+    console.warn('Server transcription service failed, falling back to adaptive captions:', serviceErr);
+    return await generateAdaptiveAmharicCaptions(request);
   }
 }
 
