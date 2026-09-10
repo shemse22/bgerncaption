@@ -75013,8 +75013,9 @@ app.post("/api/transcriptions", async (req, res) => {
       throw new Error("Gemini could not prepare this video for transcription.");
     }
     const instruction = mode === "translate_amharic" ? `Translate the spoken video into natural ${language} captions.` : `Transcribe spoken Amharic as accurate ${language} captions.`;
+    const geminiModel = process.env.GEMINI_MODEL || "gemini-1.5-pro";
     const result = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: geminiModel,
       contents: [{ role: "user", parts: [
         { text: `${instruction} Return only valid JSON in this shape: {"segments":[{"start":0.0,"end":2.5,"text":"..."}]}. Times are seconds, captions must be chronological, and no markdown. The video is about ${duration || "unknown"} seconds long.` },
         createPartFromUri(uploaded.uri, uploaded.mimeType)

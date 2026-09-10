@@ -137,10 +137,8 @@ async function transcribeWithGemini(request: TranscriptionRequest, apiKey: strin
   });
   onProgress({ stage: 'transcribing', progress: 45 });
 
-  const instruction = mode === 'translate_amharic'
-    ? `Translate the spoken content into natural ${language} captions.`
-    : `Transcribe spoken Amharic as accurate ${language} captions.`;
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+  const geminiModel = (import.meta.env.VITE_GEMINI_MODEL as string | undefined) || 'gemini-1.5-pro';
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent?key=${encodeURIComponent(apiKey)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
