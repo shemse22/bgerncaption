@@ -1,0 +1,1 @@
+import youtubeDl from 'youtube-dl-exec'; youtubeDl('https://www.youtube.com/watch?v=aqz-KE-bpKQ', { dumpJson: true, noCheckCertificates: true, noWarnings: true, preferFreeFormats: true, addHeader: ['referer:youtube.com', 'user-agent:Mozilla/5.0'] }).then(output => console.log(output.title)).catch(console.error);

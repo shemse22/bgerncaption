@@ -49,6 +49,8 @@ function asSegments(value: unknown, duration: number): CaptionSegment[] {
 
 async function uploadToConfiguredService(request: TranscriptionRequest, endpoint: string): Promise<CaptionSegment[]> {
   const { file, mode, language, duration, onProgress } = request;
+  let simInterval: ReturnType<typeof setInterval>;
+  
   const response = await new Promise<Response>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', endpoint);
@@ -58,20 +60,45 @@ async function uploadToConfiguredService(request: TranscriptionRequest, endpoint
     xhr.setRequestHeader('X-Caption-Language', language);
     xhr.setRequestHeader('X-Video-Duration', String(duration));
     xhr.setRequestHeader('X-Video-Name', file.name);
+    
     const token = localStorage.getItem(TOKEN_KEY);
     if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {
-        onProgress({ stage: 'uploading', progress: Math.round((event.loaded / event.total) * 35) });
+        const percent = Math.round((event.loaded / event.total) * 35);
+        onProgress({ stage: 'uploading', progress: percent });
+        
+        if (event.loaded >= event.total) {
+          // Upload finished, now waiting for Gemini API processing
+          onProgress({ stage: 'transcribing', progress: 35 });
+          
+          let simProgress = 35;
+          simInterval = setInterval(() => {
+            simProgress += 1;
+            if (simProgress <= 90) {
+              onProgress({ stage: 'transcribing', progress: simProgress });
+            }
+          }, 1500);
+        }
       }
     };
+    
     xhr.onload = () => {
+      clearInterval(simInterval);
       const body = xhr.response ?? xhr.responseText;
       resolve(new Response(typeof body === 'string' ? body : JSON.stringify(body), { status: xhr.status }));
     };
-    xhr.onerror = () => reject(new Error('Unable to reach the transcription service.'));
+    
+    xhr.onerror = () => {
+      clearInterval(simInterval);
+      reject(new Error('Unable to reach the transcription service.'));
+    };
+    
     xhr.send(file);
   });
+
+  clearInterval(simInterval!);
 
   if (!response.ok) {
     const detail = await response.text();

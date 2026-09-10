@@ -80,7 +80,8 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
   const handleYoutubeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onOpenUpload(undefined, 'sample-gold');
+    if (!youtubeUrl) return;
+    alert("Due to Google's strict anti-bot protections, direct YouTube link downloading is currently disabled to prevent server bans. \n\nPlease download the video to your device first using a free tool (like y2mate.com), and then upload the video file directly here!");
   };
 
   const handleDemoClick = () => {

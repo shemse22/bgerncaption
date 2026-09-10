@@ -1,0 +1,1 @@
+fetch('https://co.wuk.sh/api/json', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ url: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ' }) }).then(r => r.json()).then(console.log).catch(console.error);
