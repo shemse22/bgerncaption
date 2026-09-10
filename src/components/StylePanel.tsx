@@ -483,6 +483,9 @@ export const StylePanel: React.FC<StylePanelProps> = ({ style, onChangeStyle }) 
             {(
               [
                 { id: 'default', label: 'Yellow Glow', icon: '🌟', borderClass: 'border-yellow-400/60' },
+                { id: 'sparkle', label: 'Sparkle Duo-O', icon: '✦', borderClass: 'border-purple-400/60' },
+                { id: 'dotted', label: 'Dotted Box', icon: '⋮', borderClass: 'border-cyan-400/60' },
+                { id: 'gold', label: 'Real Gold', icon: '👑', borderClass: 'border-amber-400/60' },
                 { id: 'sparkle', label: 'Sparkle', icon: '✦', borderClass: 'border-purple-400/60' },
                 { id: 'dotted', label: 'Dotted', icon: '⋮', borderClass: 'border-cyan-400/60' },
                 { id: 'gold', label: 'Gold', icon: '👑', borderClass: 'border-amber-400/60' },

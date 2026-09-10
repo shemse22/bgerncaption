@@ -39,6 +39,7 @@ export type CaptionPreset =
   | 'sparkle-duo'
   | 'dotted-selection'
   | 'real-gold'
+  | 'red-string';
   | 'red-string'
   | 'karaoke'
   | 'neon'
@@ -49,6 +50,7 @@ export type CaptionBackground = 'none' | 'semi' | 'solid';
 
 export type TextAnimationIn = 'up' | 'down' | 'fade' | 'zoom' | 'bounce' | 'none';
 export type TextAnimationOut = 'down' | 'up' | 'fade' | 'zoom' | 'none';
+export type HighlightStyle = 'default' | 'sparkle' | 'dotted' | 'gold' | 'red-string';
 export type HighlightStyle = 'default' | 'sparkle' | 'dotted' | 'gold' | 'red-string' | 'karaoke' | 'neon';
 
 export interface CaptionStyle {
