@@ -206,8 +206,8 @@ export async function transcribeVideo(request: TranscriptionRequest): Promise<Ca
   try {
     return await uploadToConfiguredService(request, endpoint);
   } catch (serviceErr) {
-    console.warn('Server transcription service unavailable or failed, switching to adaptive Amharic transcription:', serviceErr);
-    return await generateAdaptiveAmharicCaptions(request);
+    console.error('Server transcription service failed:', serviceErr);
+    throw serviceErr;
   }
 }
 
