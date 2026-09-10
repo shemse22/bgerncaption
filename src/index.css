@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --breakpoint-xs: 420px;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Ethiopic & Amharic Font Mappings */

@@ -86,27 +86,27 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#0B0F19]/95 dark:bg-[#0B0F19]/95 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 py-3 transition-colors text-white">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-50 bg-[#0B0F19]/95 dark:bg-[#0B0F19]/95 backdrop-blur-md border-b border-slate-800/80 px-3 sm:px-6 py-2 sm:py-3 transition-colors text-white">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
         {/* Brand identity: Bgern */}
         <div
           onClick={() => {
             if (onNavigateTab) onNavigateTab('home');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="flex items-center gap-2.5 cursor-pointer group shrink-0"
+          className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group shrink-0"
         >
           {/* BG Square Logo */}
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-violet-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-600/30 group-hover:scale-105 transition-transform duration-200 font-black text-sm tracking-tighter">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-violet-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-600/30 group-hover:scale-105 transition-transform duration-200 font-black text-xs sm:text-sm tracking-tighter">
             BG
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-base sm:text-lg tracking-tight text-white">
+              <span className="font-extrabold text-sm sm:text-lg tracking-tight text-white">
                 Bgern
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 font-medium leading-none">
+            <p className="text-[10px] text-slate-400 font-medium leading-none hidden sm:block">
               Your Video. In Amharic.
             </p>
           </div>
@@ -162,19 +162,19 @@ export const Header: React.FC<HeaderProps> = ({
         </nav>
 
         {/* Right Action Controls */}
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Light / Dark Mode Toggle */}
           {onToggleTheme && (
             <button
               onClick={onToggleTheme}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/70 active:scale-95 transition touch-tap"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/70 active:scale-95 transition touch-tap"
               title="Toggle Theme"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
-                <Sun className="w-4 h-4 text-amber-400" />
+                <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
               ) : (
-                <Moon className="w-4 h-4 text-slate-300" />
+                <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-300" />
               )}
             </button>
           )}
@@ -211,10 +211,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="notification-bell-btn"
             onClick={onOpenNotifications}
-            className="relative p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/70 active:scale-95 transition touch-tap"
+            className="relative p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/70 active:scale-95 transition touch-tap"
             aria-label="Notifications"
           >
-            <Bell className="w-4 h-4" />
+            <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             {unreadCount > 0 && (
               <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center animate-pulse">
                 {unreadCount}
@@ -230,7 +230,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-login-btn"
               onClick={handleLoginClick}
-              className="text-xs font-semibold text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-slate-800/60 transition touch-tap"
+              className="hidden xs:inline-block text-xs font-semibold text-slate-300 hover:text-white px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg hover:bg-slate-800/60 transition touch-tap"
             >
               Login
             </button>
@@ -316,46 +316,59 @@ export const Header: React.FC<HeaderProps> = ({
                 onNewVideo();
               }
             }}
-            className="px-4 sm:px-5 py-2 rounded-full bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-purple-600/30 active:scale-95 transition-all duration-150 touch-tap flex items-center gap-1.5"
+            className="px-2.5 xs:px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-bold shadow-md sm:shadow-lg shadow-purple-600/30 active:scale-95 transition-all duration-150 touch-tap flex items-center gap-1 sm:gap-1.5 shrink-0"
           >
-            <span>{isAuthenticated ? 'Upload Video' : 'Get Started Free'}</span>
+            <span className="hidden xs:inline">{isAuthenticated ? 'Upload Video' : 'Get Started Free'}</span>
+            <span className="xs:hidden">{isAuthenticated ? 'Upload' : 'Start Free'}</span>
           </button>
 
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/70"
+            className="md:hidden p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/70 active:scale-95 transition"
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden mt-3 pt-3 border-t border-slate-800/80 space-y-2 pb-2">
+        <div className="md:hidden mt-3 pt-3 border-t border-slate-800/80 space-y-1.5 pb-2 animate-in slide-in-from-top-2 duration-150">
+          {!isAuthenticated && (
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleLoginClick();
+              }}
+              className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-white bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 flex items-center justify-between transition"
+            >
+              <span>Sign In / Register</span>
+              <ArrowRight className="w-4 h-4 text-purple-300" />
+            </button>
+          )}
           <button
             onClick={() => handleNavClick('top', 'home')}
-            className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800"
+            className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800 transition"
           >
             Home
           </button>
           <button
             onClick={() => handleNavClick('features', 'home')}
-            className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800"
+            className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800 transition"
           >
             Features
           </button>
           <button
             onClick={() => handleNavClick('pricing', 'price')}
-            className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800"
+            className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800 transition"
           >
             Pricing
           </button>
           <button
             onClick={() => handleNavClick('examples', 'home')}
-            className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800"
+            className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800 transition"
           >
             Examples
           </button>
@@ -367,25 +380,59 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800 flex items-center justify-between"
             >
-              <span>Projects</span>
+              <div className="flex items-center gap-2">
+                <FolderClosed className="w-4 h-4 text-purple-400" />
+                <span>Projects</span>
+              </div>
               <ArrowRight className="w-4 h-4 text-slate-400" />
             </button>
           )}
           {isAuthenticated && (
-            <button
-              onClick={async () => {
-                setMobileMenuOpen(false);
-                if (onLogout) {
-                  onLogout();
-                } else {
-                  await authService.signOut();
-                }
-              }}
-              className="w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-red-400 hover:bg-red-950/40 flex items-center gap-2"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Log Out</span>
-            </button>
+            <>
+              {onOpenProfile && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenProfile();
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800 flex items-center gap-2"
+                >
+                  <UserIcon className="w-4 h-4 text-purple-400" />
+                  <span>My Profile</span>
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenNotifications();
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-purple-400" />
+                  <span>Notifications</span>
+                </div>
+                {unreadCount > 0 && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500 text-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={async () => {
+                  setMobileMenuOpen(false);
+                  if (onLogout) {
+                    onLogout();
+                  } else {
+                    await authService.signOut();
+                  }
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-red-400 hover:bg-red-950/40 flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Log Out</span>
+              </button>
+            </>
           )}
         </div>
       )}

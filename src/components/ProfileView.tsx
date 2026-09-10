@@ -711,43 +711,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
         )}
 
-        {/* Administrator Dashboard Access & Mode Switching */}
-        <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-500/5 hover:bg-amber-500/10 dark:bg-amber-950/20 dark:hover:bg-amber-950/30 transition border-y sm:border-y-0 border-amber-200/50 dark:border-amber-800/30">
-          <div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-amber-500" />
-              <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Administrator Dashboard (የአድሚን ዳሽቦርድ)</h4>
-              <span className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[9px] font-black uppercase">
-                {user.role === 'admin' ? 'Admin Active' : 'Owner Access'}
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-              Review Telebirr/CBE payment receipts, add minutes to user accounts, configure languages & platform settings.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            {onOpenAdmin && (
-              <button
-                type="button"
-                id="open-admin-dashboard-btn"
-                onClick={onOpenAdmin}
-                className="self-start sm:self-auto min-h-[38px] px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold shadow-xs active:scale-95 touch-tap transition flex items-center gap-1.5"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Open Admin Dashboard</span>
-              </button>
-            )}
-            {onToggleRole && (
-              <button
-                type="button"
-                onClick={onToggleRole}
-                className="self-start sm:self-auto min-h-[38px] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 text-xs font-bold active:scale-95 touch-tap transition flex items-center justify-center"
-              >
-                {user.role === 'admin' ? 'Switch to Creator Preview' : 'Switch to Admin Mode'}
-              </button>
-            )}
-          </div>
-        </div>
 
         {/* PWA Section */}
         <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-850/60 transition">
@@ -782,22 +745,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
         )}
 
-        {/* Reset Demo Data */}
-        <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-850/60 transition">
-          <div>
-            <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Reset Demo Data</h4>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Restores initial 3 free minutes, sample projects, and approval queue
-            </p>
-          </div>
-          <button
-            onClick={onResetData}
-            className="self-start sm:self-auto min-h-[38px] flex items-center justify-center gap-1 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 touch-tap text-xs font-bold transition"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Reset Data</span>
-          </button>
-        </div>
       </div>
 
       {/* Change Profile Photo Modal */}

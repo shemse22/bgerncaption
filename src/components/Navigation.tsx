@@ -27,13 +27,6 @@ export const Navigation: React.FC<NavigationProps> = ({
     { id: 'profile' as NavTab, label: 'Profile', icon: User, amharic: 'መገለጫ' },
   ];
 
-  // Desktop sidebar shows all tabs; mobile bottom bar shows only 3 essential tabs
-  const mobileTabs = [
-    { id: 'home' as NavTab, label: 'Home', icon: Home },
-    { id: 'projects' as NavTab, label: 'Projects', icon: FolderClosed },
-    { id: 'profile' as NavTab, label: 'Profile', icon: User },
-  ];
-
   return (
     <>
       {/* Desktop Sidebar (hidden on mobile and hidden on home landing page) */}
@@ -98,36 +91,6 @@ export const Navigation: React.FC<NavigationProps> = ({
           </button>
         </div>
       </aside>
-
-      {/* Mobile Bottom Navigation Bar — 3 tabs only: Home, Projects, Profile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200/80 dark:border-slate-800/90 px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-xl transition-colors">
-        <div className="grid grid-cols-3 gap-1">
-          {mobileTabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                id={`mobile-nav-${tab.id}`}
-                onClick={() => onSelectTab(tab.id)}
-                className={`relative flex flex-col items-center justify-center min-h-[52px] py-1.5 px-2 rounded-2xl transition-all active:scale-90 touch-tap ${
-                  isActive
-                    ? 'text-purple-600 dark:text-purple-400 bg-purple-50/70 dark:bg-purple-950/60 font-bold'
-                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 active:bg-slate-50 dark:active:bg-slate-800'
-                }`}
-              >
-                <Icon className={`w-6 h-6 transition-transform ${isActive ? 'scale-110 text-purple-600 dark:text-purple-400' : ''}`} />
-                <span className={`text-[11px] mt-1 leading-tight tracking-tight ${isActive ? 'font-black text-purple-700 dark:text-purple-300' : 'font-medium'}`}>
-                  {tab.label}
-                </span>
-                {isActive && (
-                  <span className="absolute bottom-1.5 w-4 h-0.5 rounded-full bg-purple-600 dark:bg-purple-400" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </nav>
     </>
   );
 };

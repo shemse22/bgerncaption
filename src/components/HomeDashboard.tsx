@@ -216,7 +216,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               </div>
 
               {/* Heading */}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-[1.12]">
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-[1.15]">
                 Turn Your Videos Into{' '}
                 <span className="block bg-gradient-to-r from-purple-400 via-pink-300 to-cyan-300 bg-clip-text text-transparent">
                   Amharic Captions
@@ -224,21 +224,21 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               </h1>
 
               {/* 4 Green Checkmarks row */}
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm font-medium text-slate-300">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm font-medium text-slate-300">
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 shrink-0" />
                   <span>Fast & Accurate</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 shrink-0" />
                   <span>AI Powered</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 shrink-0" />
                   <span>100% Amharic</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 shrink-0" />
                   <span>Easy to Use</span>
                 </div>
               </div>
@@ -246,7 +246,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               {/* DUAL INPUT CARD */}
               <div
                 id="upload-section"
-                className="rounded-3xl bg-[#131B2E]/95 border border-slate-700/80 p-5 sm:p-7 backdrop-blur-xl shadow-2xl shadow-purple-950/40 relative overflow-hidden"
+                className="rounded-3xl bg-[#131B2E]/95 border border-slate-700/80 p-4 sm:p-7 backdrop-blur-xl shadow-2xl shadow-purple-950/40 relative overflow-hidden"
               >
                 <div className="grid grid-cols-1 md:grid-cols-11 gap-4 sm:gap-6 items-center">
                   {/* Left Side: Upload File */}
@@ -575,18 +575,18 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 onClick={() => onOpenUpload()}
-                className="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-600/30 transition active:scale-95 touch-tap"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-600/30 transition active:scale-95 touch-tap text-center"
               >
                 Get Started Free
               </button>
               <button
                 onClick={() => setShowDemoVideoModal(true)}
-                className="px-5 py-3 rounded-xl bg-[#131B2E] hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-xs sm:text-sm flex items-center gap-2 transition active:scale-95 touch-tap"
+                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#131B2E] hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition active:scale-95 touch-tap"
               >
-                <Play className="w-4 h-4 fill-white text-white" />
+                <Play className="w-4 h-4 fill-white text-white shrink-0" />
                 <span>Watch How It Works (1 min)</span>
               </button>
             </div>
@@ -605,7 +605,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
             {/* Before & After Comparison Card */}
             <div className="rounded-2xl p-4 sm:p-6 bg-[#131B2E]/95 border border-slate-800 shadow-2xl space-y-5">
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4">
                 {/* Before Column */}
                 <div className="space-y-2">
                   <div className="relative rounded-xl overflow-hidden border border-slate-800 bg-slate-900 aspect-video">
@@ -638,7 +638,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               {/* Ready for all platforms row */}
               <div className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
                 <span className="font-semibold text-slate-300">Ready for all platforms:</span>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                   <span className="px-2.5 py-1 rounded-lg bg-[#0C1220] border border-slate-800 text-red-500 font-bold text-[11px] flex items-center gap-1">
                     YouTube
                   </span>
@@ -730,16 +730,16 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             <p className="text-xs sm:text-sm text-purple-200">
               Join top Ethiopian creators on YouTube, TikTok, and Facebook. Start creating professional Amharic subtitles in seconds.
             </p>
-            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
               <button
                 onClick={() => onOpenUpload()}
-                className="px-6 py-3 rounded-full bg-white hover:bg-purple-50 text-purple-900 font-extrabold text-xs sm:text-sm shadow-xl active:scale-95 transition touch-tap"
+                className="w-full sm:w-auto px-6 py-3 rounded-full bg-white hover:bg-purple-50 text-purple-900 font-extrabold text-xs sm:text-sm shadow-xl active:scale-95 transition touch-tap text-center"
               >
                 Get Started Free
               </button>
               <button
                 onClick={onOpenWallet}
-                className="px-6 py-3 rounded-full bg-purple-950/60 hover:bg-purple-900/80 border border-purple-400/30 text-white font-bold text-xs sm:text-sm active:scale-95 transition touch-tap"
+                className="w-full sm:w-auto px-6 py-3 rounded-full bg-purple-950/60 hover:bg-purple-900/80 border border-purple-400/30 text-white font-bold text-xs sm:text-sm active:scale-95 transition touch-tap text-center"
               >
                 View Pricing Plans
               </button>
