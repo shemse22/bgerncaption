@@ -462,6 +462,26 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
                 playsInline
               />
 
+              {/* WATERMARK OVERLAY */}
+              {style.watermarkEnabled !== false && (
+                <div 
+                  className={`absolute z-10 pointer-events-none opacity-${Math.round((style.watermarkOpacity ?? 1) * 100)} ${
+                    (style.watermarkPosition || 'top-right') === 'top-left' ? 'top-4 left-4' :
+                    (style.watermarkPosition || 'top-right') === 'top-right' ? 'top-4 right-4' :
+                    (style.watermarkPosition || 'top-right') === 'bottom-left' ? 'bottom-20 left-4' :
+                    'bottom-20 right-4'
+                  }`}
+                >
+                  {style.watermarkImage ? (
+                    <img src={style.watermarkImage} alt="Watermark" className="h-6 sm:h-8 object-contain opacity-80" />
+                  ) : (
+                    <span className="text-white/80 font-bold text-xs sm:text-sm drop-shadow-md bg-black/30 px-2 py-1 rounded-md backdrop-blur-sm">
+                      {style.watermarkText || 'bgern.com'}
+                    </span>
+                  )}
+                </div>
+              )}
+
               {/* LIVE STYLED AMHARIC CAPTION OVERLAY WITH SEQUENTIAL WORD HIGHLIGHT & IN/OUT ANIMATIONS */}
               {activeCaption && activeCaption.text && (() => {
                 const segDuration = Math.max(0.2, activeCaption.end - activeCaption.start);
@@ -533,10 +553,15 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
                   containerExtraClasses = 'border-b-2 border-red-500/90 shadow-[0_4px_15px_rgba(239,68,68,0.3)]';
                 }
 
-                const rawText = activeCaption.text.trim();
+                let rawText = activeCaption.text.trim();
                 const words = rawText.split(/\s+/).filter(Boolean);
                 const ratio = Math.min(0.999, elapsed / segDuration);
                 const activeWordIdx = Math.floor(ratio * words.length);
+                
+                if (style.preset === 'typewriter') {
+                  const charCount = Math.max(1, Math.floor(ratio * rawText.length));
+                  rawText = rawText.slice(0, charCount);
+                }
 
                 return (
                   <div
@@ -637,6 +662,28 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
                                 <span
                                   key={wIdx}
                                   className="inline-block mx-1 font-black text-white scale-110 relative pb-1 border-b-4 border-red-500 drop-shadow-[0_2px_8px_rgba(239,68,68,0.7)] transition-all duration-100"
+                                >
+                                  {word}
+                                </span>
+                              );
+                            }
+
+                            if (highlightStyle === 'neon') {
+                              return (
+                                <span
+                                  key={wIdx}
+                                  className="inline-block mx-1 scale-110 font-black text-white drop-shadow-[0_0_12px_rgba(236,72,153,0.9)] transition-all duration-100"
+                                >
+                                  {word}
+                                </span>
+                              );
+                            }
+
+                            if (highlightStyle === 'karaoke') {
+                              return (
+                                <span
+                                  key={wIdx}
+                                  className="inline-block mx-1 scale-110 font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-200 transition-all duration-100"
                                 >
                                   {word}
                                 </span>

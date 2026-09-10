@@ -169,6 +169,16 @@ export async function burnCaptionsIntoVideo(
         videoElement.onseeked = r;
       });
 
+      let watermarkImg: HTMLImageElement | null = null;
+      if (style.watermarkEnabled !== false && style.watermarkImage) {
+        watermarkImg = new Image();
+        watermarkImg.src = style.watermarkImage;
+        await new Promise((resolve) => {
+          watermarkImg!.onload = resolve;
+          watermarkImg!.onerror = resolve;
+        });
+      }
+
       const duration = videoElement.duration || 10;
       videoElement.play();
 
@@ -190,6 +200,52 @@ export async function burnCaptionsIntoVideo(
 
         if (activeSeg && activeSeg.text) {
           drawCaptionOverlay(ctx, activeSeg.text, width, height, style, activeSeg, curTime);
+        }
+
+        // Draw Watermark
+        if (style.watermarkEnabled !== false) {
+          ctx.save();
+          ctx.globalAlpha = style.watermarkOpacity ?? 1;
+          const pos = style.watermarkPosition || 'top-right';
+          const paddingX = 40;
+          const paddingY = 40;
+
+          if (watermarkImg && watermarkImg.complete && watermarkImg.naturalHeight !== 0) {
+            const wmHeight = Math.max(30, Math.round(height * 0.05));
+            const wmWidth = (wmHeight / watermarkImg.naturalHeight) * watermarkImg.naturalWidth;
+            let wmX = paddingX;
+            let wmY = paddingY;
+
+            if (pos === 'top-right') wmX = width - wmWidth - paddingX;
+            else if (pos === 'bottom-left') wmY = height - wmHeight - paddingY - 100;
+            else if (pos === 'bottom-right') {
+              wmX = width - wmWidth - paddingX;
+              wmY = height - wmHeight - paddingY - 100;
+            }
+
+            ctx.drawImage(watermarkImg, wmX, wmY, wmWidth, wmHeight);
+          } else {
+            const wmText = style.watermarkText || 'bgern.com';
+            ctx.font = `bold ${Math.max(16, Math.round(width * 0.02))}px sans-serif`;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 4;
+            ctx.textAlign = pos.includes('right') ? 'right' : 'left';
+            ctx.textBaseline = 'top';
+
+            let txtX = paddingX;
+            let txtY = paddingY;
+
+            if (pos === 'top-right') txtX = width - paddingX;
+            else if (pos === 'bottom-left') txtY = height - paddingY - 100;
+            else if (pos === 'bottom-right') {
+              txtX = width - paddingX;
+              txtY = height - paddingY - 100;
+            }
+
+            ctx.fillText(wmText, txtX, txtY);
+          }
+          ctx.restore();
         }
 
         if (videoElement.ended || curTime >= duration - 0.1) {
@@ -221,6 +277,16 @@ function drawCaptionOverlay(
   curTime?: number
 ) {
   ctx.save();
+
+  // Animation kinetic calculation if activeSeg & curTime are provided
+  let displayText = text;
+  if (activeSeg && curTime !== undefined && style.preset === 'typewriter') {
+    const segDuration = Math.max(0.2, activeSeg.end - activeSeg.start);
+    const elapsed = Math.max(0, curTime - activeSeg.start);
+    const ratio = Math.min(0.999, elapsed / segDuration);
+    const charCount = Math.max(1, Math.floor(ratio * text.length));
+    displayText = text.slice(0, charCount);
+  }
 
   // Font calculation relative to canvas width
   const scale = canvasWidth / 800;
@@ -261,7 +327,7 @@ function drawCaptionOverlay(
   }
 
   const xPos = canvasWidth / 2;
-  const metrics = ctx.measureText(text);
+  const metrics = ctx.measureText(displayText);
   const textWidth = metrics.width;
   const paddingX = fontSize * 0.6;
   const paddingY = fontSize * 0.35;
@@ -275,7 +341,9 @@ function drawCaptionOverlay(
     style.preset === 'sparkle-duo' ? 'sparkle' :
     style.preset === 'dotted-selection' ? 'dotted' :
     style.preset === 'real-gold' ? 'gold' :
-    style.preset === 'red-string' ? 'red-string' : 'default'
+    style.preset === 'red-string' ? 'red-string' :
+    style.preset === 'karaoke' ? 'karaoke' :
+    style.preset === 'neon' ? 'neon' : 'default'
   );
 
   // Background box if selected or preset has background
@@ -305,12 +373,18 @@ function drawCaptionOverlay(
     }
   }
 
+  // Neon Glow Effect
+  if (highlight === 'neon') {
+    ctx.shadowColor = '#ec4899';
+    ctx.shadowBlur = 12 * scale;
+  }
+
   // Text Outline / Stroke
   if (style.outline > 0) {
     ctx.strokeStyle = style.outlineColor || '#000000';
     ctx.lineWidth = style.outline * scale * 2;
     ctx.lineJoin = 'round';
-    ctx.strokeText(text, xPos, yPos);
+    ctx.strokeText(displayText, xPos, yPos);
   }
 
   // Text Fill
@@ -326,11 +400,16 @@ function drawCaptionOverlay(
     duoGrad.addColorStop(0.5, '#c084fc');
     duoGrad.addColorStop(1, '#38bdf8');
     ctx.fillStyle = duoGrad;
+  } else if (highlight === 'karaoke') {
+    const karaokeGrad = ctx.createLinearGradient(boxX, 0, boxX + boxWidth, 0);
+    karaokeGrad.addColorStop(0, '#4ade80');
+    karaokeGrad.addColorStop(1, '#a7f3d0');
+    ctx.fillStyle = karaokeGrad;
   } else {
     ctx.fillStyle = style.color || '#FFFFFF';
   }
 
-  ctx.fillText(text, xPos, yPos);
+  ctx.fillText(displayText, xPos, yPos);
 
   ctx.restore();
 }

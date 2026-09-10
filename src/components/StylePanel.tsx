@@ -18,6 +18,9 @@ export const StylePanel: React.FC<StylePanelProps> = ({ style, onChangeStyle }) 
     { id: 'real-gold', label: 'Real Gold', previewText: 'ወርቅ', bgClass: 'bg-black border border-amber-500/70 shadow-amber-500/20 shadow-xs', textClass: 'text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-yellow-300 to-amber-600 font-black', badge: 'Luxury' },
     { id: 'red-string', label: 'Red String', previewText: '— እንደምን —', bgClass: 'bg-black border-b-2 border-red-500', textClass: 'text-white font-bold', badge: 'Trending' },
     { id: 'bold', label: 'Bold Yellow', previewText: 'እንደምን አደራችሁ', bgClass: 'bg-black', textClass: 'text-yellow-400 font-black' },
+    { id: 'neon', label: 'Neon Glow', previewText: 'እንደምን', bgClass: 'bg-slate-900', textClass: 'text-white font-black drop-shadow-[0_0_8px_rgba(236,72,153,0.8)]', badge: 'New' },
+    { id: 'karaoke', label: 'Karaoke', previewText: 'እንደምን', bgClass: 'bg-slate-800', textClass: 'text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-white font-black', badge: 'Sing' },
+    { id: 'typewriter', label: 'Typewriter', previewText: 'እ ን ደ ም ን', bgClass: 'bg-slate-950', textClass: 'text-emerald-400 font-mono tracking-widest' },
     { id: 'tiktok', label: 'TikTok Glow', previewText: 'እንደምን አደራችሁ', bgClass: 'bg-gradient-to-r from-pink-500/20 to-cyan-500/20', textClass: 'text-white font-black' },
     { id: 'modern', label: 'Modern', previewText: 'እንደምን አደራችሁ', bgClass: 'bg-slate-800/80', textClass: 'text-white font-sans' },
     { id: 'minimal', label: 'Minimal', previewText: 'እንደምን አደራችሁ', bgClass: 'bg-transparent', textClass: 'text-slate-100 font-medium drop-shadow' },
@@ -43,6 +46,27 @@ export const StylePanel: React.FC<StylePanelProps> = ({ style, onChangeStyle }) 
         ...presetData,
         preset: presetKey,
       });
+    }
+  };
+
+  const handleCustomFontUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const url = URL.createObjectURL(file);
+      const fontName = 'Custom_' + file.name.split('.')[0].replace(/[^a-zA-Z0-9]/g, '');
+      const fontFace = new FontFace(fontName, `url(${url})`);
+      await fontFace.load();
+      document.fonts.add(fontFace);
+      onChangeStyle({
+        ...style,
+        font: fontName,
+        customFontName: fontName,
+        customFontUrl: url,
+      });
+    } catch (err) {
+      console.error('Failed to load custom font', err);
+      alert('Failed to load font file. Please try a valid TTF/OTF file.');
     }
   };
 
@@ -153,10 +177,11 @@ export const StylePanel: React.FC<StylePanelProps> = ({ style, onChangeStyle }) 
 
         {/* Dropdown Alternative */}
         <select
-          value={style.font}
-          onChange={(e) => onChangeStyle({ ...style, font: e.target.value })}
+          value={style.customFontName ? style.customFontName : style.font}
+          onChange={(e) => onChangeStyle({ ...style, font: e.target.value, customFontName: undefined })}
           className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:outline-hidden"
         >
+          {style.customFontName && <option value={style.customFontName}>{style.customFontName} (Custom)</option>}
           <option value="Easy Amharic Typing">Easy Amharic Typing (ቀሊል አማርኛ መተየቢያ)</option>
           <option value="Noto Sans Ethiopic">Noto Sans Ethiopic (ኖቶ ሳንስ ኢትዮጲክ - Modern)</option>
           <option value="Noto Serif Ethiopic">Noto Serif Ethiopic (ኖቶ ሰሪፍ ኢትዮጲክ - Classic)</option>
@@ -164,6 +189,13 @@ export const StylePanel: React.FC<StylePanelProps> = ({ style, onChangeStyle }) 
           <option value="Nyala">Nyala (ኒያላ - Standard Windows)</option>
           <option value="system-ui">System Sans-Serif</option>
         </select>
+        <div className="mt-2">
+          <label className="flex items-center justify-center gap-2 w-full py-2 px-3 border-2 border-dashed border-slate-300 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 hover:border-slate-400 hover:text-slate-800 transition cursor-pointer active:scale-95 touch-tap">
+            <ArrowUp className="w-4 h-4" />
+            Upload Custom Font (.ttf / .otf)
+            <input type="file" accept=".ttf,.otf,.woff" onChange={handleCustomFontUpload} className="hidden" />
+          </label>
+        </div>
       </div>
 
       {/* Font Size Stepper & Slider */}
@@ -451,10 +483,12 @@ export const StylePanel: React.FC<StylePanelProps> = ({ style, onChangeStyle }) 
             {(
               [
                 { id: 'default', label: 'Yellow Glow', icon: '🌟', borderClass: 'border-yellow-400/60' },
-                { id: 'sparkle', label: 'Sparkle Duo-O', icon: '✦', borderClass: 'border-purple-400/60' },
-                { id: 'dotted', label: 'Dotted Box', icon: '⋮', borderClass: 'border-cyan-400/60' },
-                { id: 'gold', label: 'Real Gold', icon: '👑', borderClass: 'border-amber-400/60' },
+                { id: 'sparkle', label: 'Sparkle', icon: '✦', borderClass: 'border-purple-400/60' },
+                { id: 'dotted', label: 'Dotted', icon: '⋮', borderClass: 'border-cyan-400/60' },
+                { id: 'gold', label: 'Gold', icon: '👑', borderClass: 'border-amber-400/60' },
                 { id: 'red-string', label: 'Red String', icon: '🎗️', borderClass: 'border-red-500/60' },
+                { id: 'karaoke', label: 'Karaoke', icon: '🎤', borderClass: 'border-green-400/60' },
+                { id: 'neon', label: 'Neon Glow', icon: '⚡', borderClass: 'border-pink-400/60' },
               ] as { id: HighlightStyle; label: string; icon: string; borderClass: string }[]
             ).map((hl) => {
               const isSelected = (style.highlightStyle || 'default') === hl.id;
@@ -478,6 +512,90 @@ export const StylePanel: React.FC<StylePanelProps> = ({ style, onChangeStyle }) 
             })}
           </div>
         </div>
+      </div>
+
+      {/* Watermarks (Premium) Section */}
+      <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <Crown className="w-4 h-4 text-amber-500" />
+            <label className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              Watermark (Premium)
+            </label>
+          </div>
+          <button
+            type="button"
+            onClick={() => onChangeStyle({ ...style, watermarkEnabled: !style.watermarkEnabled })}
+            className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition cursor-pointer ${
+              style.watermarkEnabled !== false
+                ? 'bg-blue-50 text-blue-600 border-blue-300'
+                : 'bg-slate-100 text-slate-400 border-slate-300'
+            }`}
+          >
+            {style.watermarkEnabled !== false ? '● Visible' : '○ Hidden'}
+          </button>
+        </div>
+
+        {style.watermarkEnabled !== false && (
+          <div className="space-y-3 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+            <div>
+              <label className="text-[10px] font-semibold text-slate-500 block mb-1">Watermark Text</label>
+              <input
+                type="text"
+                value={style.watermarkText ?? 'bgern.com'}
+                onChange={(e) => onChangeStyle({ ...style, watermarkText: e.target.value })}
+                placeholder="bgern.com"
+                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-medium focus:ring-1 focus:ring-blue-500 outline-none"
+              />
+            </div>
+            
+            <div>
+              <label className="text-[10px] font-semibold text-slate-500 block mb-1">Or Upload Custom Logo</label>
+              <label className="flex items-center justify-center gap-2 w-full py-2 px-3 border-2 border-dashed border-slate-300 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                <ArrowUp className="w-3.5 h-3.5" />
+                Upload Image (PNG/JPG)
+                <input 
+                  type="file" 
+                  accept="image/png, image/jpeg, image/webp" 
+                  className="hidden" 
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const url = URL.createObjectURL(file);
+                      onChangeStyle({ ...style, watermarkImage: url });
+                    }
+                  }} 
+                />
+              </label>
+              {style.watermarkImage && (
+                <div className="mt-2 flex justify-between items-center bg-white p-1.5 rounded-lg border border-slate-200">
+                  <img src={style.watermarkImage} alt="Watermark" className="h-6 object-contain" />
+                  <button onClick={() => onChangeStyle({ ...style, watermarkImage: undefined })} className="text-[10px] text-red-500 px-2 py-1 font-bold">Remove</button>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="text-[10px] font-semibold text-slate-500 block mb-1">Position</label>
+              <div className="grid grid-cols-2 gap-1.5">
+                {(['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const).map(pos => (
+                  <button
+                    key={pos}
+                    type="button"
+                    onClick={() => onChangeStyle({ ...style, watermarkPosition: pos })}
+                    className={`py-1 text-[10px] rounded-lg border font-bold capitalize ${
+                      (style.watermarkPosition || 'top-right') === pos
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-white text-slate-600 border-slate-200'
+                    }`}
+                  >
+                    {pos.replace('-', ' ')}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

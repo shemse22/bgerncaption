@@ -39,14 +39,17 @@ export type CaptionPreset =
   | 'sparkle-duo'
   | 'dotted-selection'
   | 'real-gold'
-  | 'red-string';
+  | 'red-string'
+  | 'karaoke'
+  | 'neon'
+  | 'typewriter';
 
 export type CaptionPosition = 'top' | 'center' | 'bottom';
 export type CaptionBackground = 'none' | 'semi' | 'solid';
 
 export type TextAnimationIn = 'up' | 'down' | 'fade' | 'zoom' | 'bounce' | 'none';
 export type TextAnimationOut = 'down' | 'up' | 'fade' | 'zoom' | 'none';
-export type HighlightStyle = 'default' | 'sparkle' | 'dotted' | 'gold' | 'red-string';
+export type HighlightStyle = 'default' | 'sparkle' | 'dotted' | 'gold' | 'red-string' | 'karaoke' | 'neon';
 
 export interface CaptionStyle {
   preset: CaptionPreset;
@@ -63,6 +66,17 @@ export interface CaptionStyle {
   animateOut?: TextAnimationOut;
   animationSpeed?: 'slow' | 'normal' | 'fast';
   highlightStyle?: HighlightStyle;
+  
+  // Custom Fonts
+  customFontUrl?: string;
+  customFontName?: string;
+
+  // Watermarks
+  watermarkEnabled?: boolean;
+  watermarkText?: string;
+  watermarkImage?: string;
+  watermarkPosition?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+  watermarkOpacity?: number;
 }
 
 export type ProjectStatus = 'queued' | 'processing' | 'completed' | 'failed';
