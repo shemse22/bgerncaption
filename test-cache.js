@@ -1,0 +1,1 @@
+fetch('https://bgern.com/assets/index-bnCq7p8Y.css?v=' + Date.now()).then(r => console.log('Status:', r.status, 'Type:', r.headers.get('content-type'), 'Len:', r.headers.get('content-length'))).catch(console.error);

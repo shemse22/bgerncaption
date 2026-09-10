@@ -1,0 +1,1 @@
+fetch('https://bgern.com/assets/index-BJ--dPV3.js').then(r => console.log('JS Status:', r.status, 'Content-Type:', r.headers.get('content-type'), 'Length:', r.headers.get('content-length'))).catch(console.error);
