@@ -14,7 +14,11 @@
   RewriteCond %{REQUEST_URI} ^/api/ [NC]
   RewriteRule ^api/(.*)$ http://127.0.0.1:8787/api/$1 [P,L]
 
-  # 3. Single Page Application (SPA) routing for React / Vite
+  # 3. SEO 301 Redirects for Old Website Paths
+  RewriteRule ^tools(/.*)?$ / [L,R=301]
+  RewriteRule ^categories(/.*)?$ / [L,R=301]
+
+  # 4. Single Page Application (SPA) routing for React / Vite
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
