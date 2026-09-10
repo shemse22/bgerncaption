@@ -73958,7 +73958,7 @@ var DEFAULT_STYLE = {
   animationSpeed: "normal",
   highlightStyle: "default"
 };
-var INITIAL_PACKAGES2 = [
+var INITIAL_PACKAGES = [
   {
     id: "starter",
     name: "Starter",
@@ -74249,7 +74249,7 @@ var INITIAL_NOTIFICATIONS = [
     type: "system"
   }
 ];
-var INITIAL_PAYMENT_PLATFORMS2 = [
+var INITIAL_PAYMENT_PLATFORMS = [
   {
     id: "plat-telebirr",
     name: "Telebirr",
@@ -74285,7 +74285,7 @@ var INITIAL_PAYMENT_PLATFORMS2 = [
     isActive: true
   }
 ];
-var INITIAL_LANGUAGES2 = [
+var INITIAL_LANGUAGES = [
   {
     id: "amharic",
     name: "Amharic",
@@ -74301,9 +74301,9 @@ var INITIAL_SETTINGS = {
   supportedFormats: ["MP4", "MOV", "MKV", "WEBM"],
   telebirrAccount: "+251 911 234 567 (Bgern Media)",
   cbeAccount: "1000 4819 2837 4 (Bgern Caption Technologies)",
-  paymentPlatforms: INITIAL_PAYMENT_PLATFORMS2,
-  supportedLanguages: INITIAL_LANGUAGES2,
-  packages: INITIAL_PACKAGES2,
+  paymentPlatforms: INITIAL_PAYMENT_PLATFORMS,
+  supportedLanguages: INITIAL_LANGUAGES,
+  packages: INITIAL_PACKAGES,
   maintenanceMode: false,
   adminUsername: "admin",
   adminEmail: "thebigel16@gmail.com",

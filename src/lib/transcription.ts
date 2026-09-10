@@ -138,11 +138,15 @@ async function transcribeWithGemini(request: TranscriptionRequest, apiKey: strin
   onProgress({ stage: 'transcribing', progress: 45 });
 
   const geminiModel = (import.meta.env.VITE_GEMINI_MODEL as string | undefined) || 'gemini-1.5-pro';
+  const promptText = mode === 'translate_amharic'
+    ? `Listen carefully to all spoken audio in this video. Translate the spoken speech faithfully into natural Amharic script (የፊደል ገበታ). Transcribe EXACTLY what the speakers say word-for-word, synchronized with timestamps.`
+    : `Listen carefully to all spoken audio in this video. Transcribe the exact words spoken by the speaker into authentic Amharic script (የፊደል ገበታ). Transcribe EXACTLY what is actually said word-for-word with precise timing, do NOT summarize, do NOT generate generic text, and do NOT use latin transliteration.`;
+
   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent?key=${encodeURIComponent(apiKey)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: `${instruction} Return ONLY JSON: {"segments":[{"start":0.0,"end":2.5,"text":"..."}]}. Use seconds, preserve chronological order, cover the full ${duration}-second video, and do not use markdown.` }, { inlineData: { mimeType: file.type || 'video/mp4', data: base64 } }] }],
+      contents: [{ parts: [{ text: `${promptText} Return ONLY JSON: {"segments":[{"start":0.0,"end":2.5,"text":"..."}]}. Use seconds, preserve chronological order, cover the full ${duration}-second video, and do not use markdown.` }, { inlineData: { mimeType: file.type || 'video/mp4', data: base64 } }] }],
       generationConfig: { responseMimeType: 'application/json', temperature: 0.1 },
     }),
   });

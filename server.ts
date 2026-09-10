@@ -21,7 +21,10 @@ import {
   INITIAL_SETTINGS,
   INITIAL_TRANSACTIONS,
   INITIAL_USERS,
+  INITIAL_PAYMENT_PLATFORMS,
+  INITIAL_LANGUAGES,
 } from './src/lib/storage';
+import { INITIAL_PACKAGES } from './src/lib/amharicData';
 
 dotenv.config({ path: '.env.local' });
 dotenv.config();

@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { User, PaymentRecord, SystemSettings, ManualPaymentPlatform, CaptionLanguageOption } from '../types';
 import { formatTimeSeconds } from '../lib/subtitles';
-import { INITIAL_PAYMENT_PLATFORMS, INITIAL_LANGUAGES } from '../lib/storage';
+import { INITIAL_PAYMENT_PLATFORMS, INITIAL_LANGUAGES, INITIAL_SETTINGS } from '../lib/storage';
 
 interface AdminDashboardProps {
   users: User[];
