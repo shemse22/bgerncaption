@@ -1040,6 +1040,48 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold font-mono"
               />
             </div>
+
+            <div className="sm:col-span-2 pt-2 border-t border-slate-100">
+              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">
+                Google Gemini AI Transcription
+              </h4>
+              <p className="text-[11px] text-slate-500 mb-3">
+                This key performs the actual speech-to-text transcription of your uploaded videos into Amharic.
+              </p>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="text-xs font-bold text-slate-700 block mb-1">
+                Google Gemini API Key
+              </label>
+              <input
+                type="text"
+                placeholder="AIzaSy..."
+                value={settings.geminiApiKey || ''}
+                onChange={(e) =>
+                  onSaveSettings({ ...settings, geminiApiKey: e.target.value })
+                }
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-700 block mb-1">
+                Gemini Model
+              </label>
+              <select
+                value={settings.geminiModel || 'gemini-1.5-pro'}
+                onChange={(e) =>
+                  onSaveSettings({ ...settings, geminiModel: e.target.value })
+                }
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold"
+              >
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Recommended)</option>
+                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+              </select>
+            </div>
           </div>
 
           <div className="pt-2">

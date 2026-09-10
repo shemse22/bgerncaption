@@ -189,6 +189,8 @@ export interface SystemSettings {
   supportedLanguages: CaptionLanguageOption[];
   packages: PricingPackage[];
   maintenanceMode: boolean;
+  geminiApiKey?: string;
+  geminiModel?: string;
   adminUsername?: string;
   adminEmail?: string;
   adminPassword?: string;

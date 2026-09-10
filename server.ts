@@ -737,7 +737,9 @@ async function verifyPayment(method: string, reference: string, amountEtb: numbe
 app.post('/api/transcriptions', async (req: Request, res: Response) => {
   const user = await requireUser(req, res);
   if (!user) return;
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  const db = await readDb();
+  const apiKey = req.header('x-gemini-key') || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || db.settings?.geminiApiKey;
+  const geminiModel = process.env.GEMINI_MODEL || db.settings?.geminiModel || 'gemini-1.5-pro';
   const body = req.body as Buffer | undefined;
   const mimeType = req.header('content-type')?.split(';')[0] || 'video/mp4';
   const mode = req.header('x-caption-mode') === 'translate_amharic' ? 'translate_amharic' : 'speech_amharic';
@@ -783,14 +785,14 @@ app.post('/api/transcriptions', async (req: Request, res: Response) => {
   };
 
   if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-    console.warn('[Transcription] GEMINI_API_KEY is not configured or placeholder. Returning synchronized Amharic captions.');
+    console.warn('[Transcription] GEMINI_API_KEY is not configured in .env or Admin Settings. Returning placeholder captions.');
     return res.json({ segments: buildFallbackSegments(duration) });
   }
 
   const ai = new GoogleGenAI({ apiKey });
   let uploadedName: string | undefined;
+  let tempFilePath: string | undefined;
   try {
-    const db = await readDb();
     db.jobs = [{
       id: jobId,
       userId: user.id,
@@ -801,34 +803,59 @@ app.post('/api/transcriptions', async (req: Request, res: Response) => {
     }, ...db.jobs];
     await writeDb(db);
 
-    const blob = new Blob([body], { type: mimeType });
-    let uploaded = await ai.files.upload({ file: blob, config: { mimeType, displayName: filename } });
+    const ext = mimeType.includes('webm') ? 'webm' : 'mp4';
+    tempFilePath = path.join(process.cwd(), `tmp-${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`);
+    fs.writeFileSync(tempFilePath, body!);
+
+    console.log(`[Gemini] Uploading video to Gemini File API (${body!.length} bytes, model: ${geminiModel})...`);
+    let uploaded = await ai.files.upload({ file: tempFilePath, config: { mimeType, displayName: filename } });
     uploadedName = uploaded.name;
 
+    let fileInfo = await ai.files.get({ name: uploaded.name! });
     let attempts = 0;
-    while (uploaded.state === 'PROCESSING' && attempts < 15) {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      uploaded = await ai.files.get({ name: uploaded.name! });
+    while (fileInfo.state === 'PROCESSING' && attempts < 40) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      fileInfo = await ai.files.get({ name: uploaded.name! });
       attempts++;
     }
-    if (uploaded.state === 'FAILED' || !uploaded.uri || !uploaded.mimeType) {
-      throw new Error('Gemini could not prepare this video for transcription.');
+    if (fileInfo.state !== 'ACTIVE') {
+      throw new Error(`Gemini video processing did not reach ACTIVE state (state: ${fileInfo.state})`);
     }
 
     const instruction = mode === 'translate_amharic'
       ? `Translate the spoken video into natural ${language} captions.`
       : `Transcribe spoken Amharic as accurate ${language} captions.`;
-    const geminiModel = process.env.GEMINI_MODEL || 'gemini-1.5-pro';
+
+    const prompt = `You are a professional video subtitler and Amharic transcriptionist.
+Listen to the audio in the video file and accurately transcribe what the speaker is ACTUALLY SAYING.
+${instruction}
+
+STRICT REQUIREMENTS:
+1. Every segment must be real speech spoken in the video with exact start and end timestamps in seconds.
+2. Captions must be chronological and cover the whole video.
+3. Use proper Amharic Fidel script (e.g. አማርኛ).
+4. Do NOT output generic sentences or templates. Only transcribe what is actually spoken in this video.
+5. Return ONLY a valid JSON object matching this schema without markdown fences:
+{"segments":[{"start":0.0,"end":2.5,"text":"የተነገረ ጽሑፍ"}]}`;
+
+    console.log(`[Gemini] Generating captions using ${geminiModel}...`);
     const result = await ai.models.generateContent({
       model: geminiModel,
-      contents: [{ role: 'user', parts: [
-        { text: `${instruction} Return only valid JSON in this shape: {"segments":[{"start":0.0,"end":2.5,"text":"..."}]}. Times are seconds, captions must be chronological, and no markdown. The video is about ${duration || 'unknown'} seconds long.` },
-        createPartFromUri(uploaded.uri, uploaded.mimeType),
-      ] }],
+      contents: [
+        createPartFromUri(fileInfo.uri!, fileInfo.mimeType || mimeType),
+        prompt,
+      ],
       config: { responseMimeType: 'application/json', temperature: 0.1 },
     });
-    const output = JSON.parse(result.text || '{}');
-    if (!Array.isArray(output.segments) || output.segments.length === 0) throw new Error('No timed caption segments were returned.');
+
+    const responseText = result.text || '';
+    const cleanJson = responseText.replace(/```json\n?|\n?```/g, '').trim();
+    const output = JSON.parse(cleanJson || '{}');
+    if (!Array.isArray(output.segments) || output.segments.length === 0) {
+      throw new Error('Gemini returned empty or invalid caption segments.');
+    }
+    console.log(`[Gemini] Successfully transcribed ${output.segments.length} real caption segments!`);
+
     const completedDb = await readDb();
     completedDb.jobs = completedDb.jobs.map((job) => job.id === jobId ? { ...job, status: 'completed', progress: 100, updatedAt: new Date().toISOString() } : job);
     addTransaction(completedDb, {
@@ -844,9 +871,12 @@ app.post('/api/transcriptions', async (req: Request, res: Response) => {
     await writeDb(completedDb);
     return res.json(output);
   } catch (error) {
-    console.error('Gemini transcription failed, recovering gracefully with synchronized captions:', error);
+    console.error('[Gemini] Real transcription failed:', error);
     return res.json({ segments: buildFallbackSegments(duration) });
   } finally {
+    if (tempFilePath && fs.existsSync(tempFilePath)) {
+      try { fs.unlinkSync(tempFilePath); } catch {}
+    }
     if (uploadedName) await ai.files.delete({ name: uploadedName }).catch(() => undefined);
   }
 });
