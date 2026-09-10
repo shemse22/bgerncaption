@@ -57,8 +57,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [grantUser, setGrantUser] = useState<User | null>(null);
   const [minutesToGrant, setMinutesToGrant] = useState<number>(10);
 
+  const safeSettings = settings || INITIAL_SETTINGS;
+  const safeUsers = Array.isArray(users) ? users : [];
+  const safePayments = Array.isArray(payments) ? payments : [];
+
   // Manual Payment Platform Management State
-  const platforms: ManualPaymentPlatform[] = settings.paymentPlatforms || INITIAL_PAYMENT_PLATFORMS;
+  const platforms: ManualPaymentPlatform[] = safeSettings.paymentPlatforms || INITIAL_PAYMENT_PLATFORMS;
   const [showPlatformModal, setShowPlatformModal] = useState<boolean>(false);
   const [editingPlatformId, setEditingPlatformId] = useState<string | null>(null);
   const [platformName, setPlatformName] = useState<string>('');
@@ -68,17 +72,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [platformBadge, setPlatformBadge] = useState<string>('Instant');
 
   // Caption Languages Management State
-  const supportedLanguages: CaptionLanguageOption[] = settings.supportedLanguages || INITIAL_LANGUAGES;
+  const supportedLanguages: CaptionLanguageOption[] = safeSettings.supportedLanguages || INITIAL_LANGUAGES;
   const [showLanguageModal, setShowLanguageModal] = useState<boolean>(false);
   const [langName, setLangName] = useState<string>('');
   const [langNativeName, setLangNativeName] = useState<string>('');
   const [langFlag, setLangFlag] = useState<string>('🇪🇹');
 
   // Stats calculation (Real data calculated from payments and users)
-  const pendingPayments = payments.filter((p) => p.status === 'pending');
-  const approvedPayments = payments.filter((p) => p.status === 'approved');
-  const totalRevenue = approvedPayments.reduce((sum, p) => sum + p.amountEtb, 0);
-  const totalMinutesSold = approvedPayments.reduce((sum, p) => sum + p.minutes, 0);
+  const pendingPayments = safePayments.filter((p) => p && p.status === 'pending');
+  const approvedPayments = safePayments.filter((p) => p && p.status === 'approved');
+  const totalRevenue = approvedPayments.reduce((sum, p) => sum + (p.amountEtb || 0), 0);
+  const totalMinutesSold = approvedPayments.reduce((sum, p) => sum + (p.minutes || 0), 0);
 
   const showToast = (type: 'success' | 'error', text: string) => {
     setToastMessage({ type, text });
@@ -281,14 +285,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     showToast('success', `Removed language: ${name}`);
   };
 
-  const filteredPayments = payments.filter((p) =>
-    paymentFilter === 'all' ? true : p.status === paymentFilter
+  const filteredPayments = safePayments.filter((p) =>
+    paymentFilter === 'all' ? true : p && p.status === paymentFilter
   );
 
-  const filteredUsers = users.filter(
+  const filteredUsers = safeUsers.filter(
     (u) =>
-      u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
-      u.email.toLowerCase().includes(userSearch.toLowerCase())
+      (u?.name || '').toLowerCase().includes(userSearch.toLowerCase()) ||
+      (u?.email || '').toLowerCase().includes(userSearch.toLowerCase())
   );
 
   return (
@@ -340,9 +344,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Total Users</span>
               <Users className="w-4 h-4 text-blue-600" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-slate-900">{users.length}</div>
+            <div className="text-xl sm:text-2xl font-black text-slate-900">{safeUsers.length}</div>
             <p className="text-[10px] text-slate-500 font-medium">
-              {users.filter((u) => u.status === 'active').length} active accounts
+              {safeUsers.filter((u) => u && u.status === 'active').length} active accounts
             </p>
           </div>
 
@@ -932,9 +936,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </label>
             <input
               type="number"
-              value={settings.freeMinutes}
+              value={safeSettings.freeMinutes ?? 3}
               onChange={(e) =>
-                onSaveSettings({ ...settings, freeMinutes: Number(e.target.value) })
+                onSaveSettings({ ...safeSettings, freeMinutes: Number(e.target.value) })
               }
               className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold"
             />
@@ -946,17 +950,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </label>
             <input
               type="text"
-              value={settings.telebirrAccount}
+              value={safeSettings.telebirrAccount || ''}
               onChange={(e) => {
                 const val = e.target.value;
-                const currentPlatforms = settings.paymentPlatforms || INITIAL_PAYMENT_PLATFORMS;
+                const currentPlatforms = safeSettings.paymentPlatforms || INITIAL_PAYMENT_PLATFORMS;
                 const updatedPlatforms = currentPlatforms.map((p) =>
                   p.id === 'plat-telebirr' || p.name.toLowerCase().includes('telebirr')
                     ? { ...p, accountNumber: val }
                     : p
                 );
                 onSaveSettings({
-                  ...settings,
+                  ...safeSettings,
                   telebirrAccount: val,
                   paymentPlatforms: updatedPlatforms,
                 });
@@ -971,17 +975,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </label>
             <input
               type="text"
-              value={settings.cbeAccount}
+              value={safeSettings.cbeAccount || ''}
               onChange={(e) => {
                 const val = e.target.value;
-                const currentPlatforms = settings.paymentPlatforms || INITIAL_PAYMENT_PLATFORMS;
+                const currentPlatforms = safeSettings.paymentPlatforms || INITIAL_PAYMENT_PLATFORMS;
                 const updatedPlatforms = currentPlatforms.map((p) =>
                   p.id === 'plat-cbe' || p.name.toLowerCase().includes('cbe') || p.name.toLowerCase().includes('commercial bank')
                     ? { ...p, accountNumber: val }
                     : p
                 );
                 onSaveSettings({
-                  ...settings,
+                  ...safeSettings,
                   cbeAccount: val,
                   paymentPlatforms: updatedPlatforms,
                 });
@@ -1005,9 +1009,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </label>
               <input
                 type="text"
-                value={settings.adminUsername || 'admin'}
+                value={safeSettings.adminUsername || 'admin'}
                 onChange={(e) =>
-                  onSaveSettings({ ...settings, adminUsername: e.target.value })
+                  onSaveSettings({ ...safeSettings, adminUsername: e.target.value })
                 }
                 className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold"
               />
@@ -1019,9 +1023,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </label>
               <input
                 type="email"
-                value={settings.adminEmail || 'thebigel16@gmail.com'}
+                value={safeSettings.adminEmail || 'thebigel16@gmail.com'}
                 onChange={(e) =>
-                  onSaveSettings({ ...settings, adminEmail: e.target.value })
+                  onSaveSettings({ ...safeSettings, adminEmail: e.target.value })
                 }
                 className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold"
               />
@@ -1033,9 +1037,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </label>
               <input
                 type="text"
-                value={settings.adminPassword || 'bgern@2026'}
+                value={safeSettings.adminPassword || 'bgern@2026'}
                 onChange={(e) =>
-                  onSaveSettings({ ...settings, adminPassword: e.target.value })
+                  onSaveSettings({ ...safeSettings, adminPassword: e.target.value })
                 }
                 className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold font-mono"
               />
@@ -1057,9 +1061,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <input
                 type="text"
                 placeholder="AIzaSy..."
-                value={settings.geminiApiKey || ''}
+                value={safeSettings.geminiApiKey || ''}
                 onChange={(e) =>
-                  onSaveSettings({ ...settings, geminiApiKey: e.target.value })
+                  onSaveSettings({ ...safeSettings, geminiApiKey: e.target.value })
                 }
                 className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold font-mono"
               />
@@ -1070,9 +1074,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 Gemini Model
               </label>
               <select
-                value={settings.geminiModel || 'gemini-1.5-pro'}
+                value={safeSettings.geminiModel || 'gemini-1.5-pro'}
                 onChange={(e) =>
-                  onSaveSettings({ ...settings, geminiModel: e.target.value })
+                  onSaveSettings({ ...safeSettings, geminiModel: e.target.value })
                 }
                 className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm sm:text-xs font-bold"
               >

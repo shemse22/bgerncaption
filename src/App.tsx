@@ -13,6 +13,7 @@ import { ProjectsView } from './components/ProjectsView';
 import { WalletView } from './components/WalletView';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AdminPage } from './components/AdminPage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { NotificationsView } from './components/NotificationsView';
 import { ProfileView } from './components/ProfileView';
 import { OfflineIndicator } from './components/OfflineIndicator';
@@ -633,15 +634,19 @@ export default function App() {
   };
 
   if (isStandaloneAdmin) {
-    return <AdminPage
-      users={users}
-      payments={payments}
-      settings={settings}
-      onApprovePayment={handleApprovePayment}
-      onRejectPayment={handleRejectPayment}
-      onAddUserMinutes={handleAddUserMinutes}
-      onSaveSettings={handleSaveSettings}
-    />;
+    return (
+      <ErrorBoundary fallbackTitle="Admin Portal Error">
+        <AdminPage
+          users={users}
+          payments={payments}
+          settings={settings}
+          onApprovePayment={handleApprovePayment}
+          onRejectPayment={handleRejectPayment}
+          onAddUserMinutes={handleAddUserMinutes}
+          onSaveSettings={handleSaveSettings}
+        />
+      </ErrorBoundary>
+    );
   }
 
   return (

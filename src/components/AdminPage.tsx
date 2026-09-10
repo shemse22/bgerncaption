@@ -13,8 +13,10 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { AdminDashboard } from './AdminDashboard';
+import { ErrorBoundary } from './ErrorBoundary';
 import { PaymentRecord, SystemSettings, User } from '../types';
 import { Api } from '../lib/api';
+import { INITIAL_SETTINGS } from '../lib/storage';
 
 interface AdminPageProps {
   users: User[];
@@ -53,9 +55,10 @@ export const AdminPage: React.FC<AdminPageProps> = (props) => {
     return sessionStorage.getItem('bgern_admin_username') || 'admin';
   });
 
-  const validUsername = (props.settings.adminUsername || 'admin').toLowerCase();
-  const validEmail = (props.settings.adminEmail || 'thebigel16@gmail.com').toLowerCase();
-  const validPassword = props.settings.adminPassword || 'bgern@2026';
+  const safeSettings = props.settings || INITIAL_SETTINGS;
+  const validUsername = (safeSettings?.adminUsername || 'admin').toLowerCase();
+  const validEmail = (safeSettings?.adminEmail || 'thebigel16@gmail.com').toLowerCase();
+  const validPassword = safeSettings?.adminPassword || 'bgern@2026';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -346,7 +349,9 @@ export const AdminPage: React.FC<AdminPageProps> = (props) => {
       </header>
 
       <main className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
-        <AdminDashboard {...props} />
+        <ErrorBoundary fallbackTitle="Admin Dashboard Error">
+          <AdminDashboard {...props} />
+        </ErrorBoundary>
       </main>
     </div>
   );
