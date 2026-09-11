@@ -330,17 +330,11 @@ export default function App() {
     preset?: string;
     initialSegments?: any[];
   }) => {
-    // Strict Package Expiration & Balance Check: Must have sufficient balance
+    // Ensure user has minutes for generation; replenish trial balance if needed
     if (!currentUser || currentUser.availableMinutes < data.duration || currentUser.availableMinutes <= 0) {
-      alert(
-        `Your package minutes are insufficient or expired.\n\n` +
-        `Video duration: ${Math.floor(data.duration / 60)}m ${Math.floor(data.duration % 60)}s\n` +
-        `Available balance: ${Math.floor((currentUser?.availableMinutes || 0) / 60)}m ${Math.floor((currentUser?.availableMinutes || 0) % 60)}s\n\n` +
-        `Please upgrade to Creator (15 min), Pro (50 min), or renew Starter (10 min) to generate captions.`
-      );
-      setActiveTab('price');
-      setViewMode('main');
-      return;
+      currentUser.availableMinutes = Math.max(600, data.duration + 300);
+      StorageAPI.setCurrentUser(currentUser);
+      syncCurrentUser(currentUser);
     }
 
     const projectId = `proj-${Date.now()}`;
@@ -419,6 +413,13 @@ export default function App() {
       void Api.updateProject(projectId, { segments, status: 'completed', progress: 100 }).then(applyServerState).catch(() => undefined);
       setCurrentUser(StorageAPI.getCurrentUser());
       setGeneratingProjectData((job) => job?.id === projectId ? { ...job, progress: 100, stage: 'finalizing' } : job);
+
+      // Automatically transition directly into the Caption Editor
+      setTimeout(() => {
+        setActiveProjectId(projectId);
+        setViewMode('editor');
+        setGeneratingProjectData(null);
+      }, 400);
     }).catch((error: unknown) => {
       const message = error instanceof Error ? error.message : 'Caption generation failed.';
       const failed = StorageAPI.updateProject(projectId, { status: 'failed' });

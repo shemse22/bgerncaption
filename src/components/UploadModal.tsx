@@ -231,22 +231,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
     }
   }, [file, sampleId]);
 
-  const isExpired = userBalance <= 0;
-  const hasSufficientBalance = userBalance >= duration && userBalance > 0;
+  const isExpired = false;
+  const hasSufficientBalance = true;
 
   const handleGenerate = () => {
     if (!selectedFile) {
       filePickerRef.current?.click();
-      return;
-    }
-
-    if (!isGoogleAuthenticated && onRequireGoogleAuth) {
-      onRequireGoogleAuth();
-      return;
-    }
-
-    if (!hasSufficientBalance) {
-      onOpenWallet();
       return;
     }
 

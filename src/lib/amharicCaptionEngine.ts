@@ -76,7 +76,14 @@ export async function detectSpeechIntervalsFromAudio(
   onProgress?: (progress: number) => void
 ): Promise<SpeechInterval[]> {
   try {
-    if (typeof window === 'undefined' || (!window.AudioContext && !(window as any).webkitAudioContext)) {
+    if (
+      typeof window === 'undefined' ||
+      (!window.AudioContext && !(window as any).webkitAudioContext) ||
+      !file ||
+      typeof file.arrayBuffer !== 'function' ||
+      file.size > 20 * 1024 * 1024 // Skip heavy decoding on files larger than 20MB
+    ) {
+      onProgress?.(60);
       return generateCadenceSpeechIntervals(fallbackDuration);
     }
 
@@ -88,14 +95,22 @@ export async function detectSpeechIntervalsFromAudio(
     const arrayBuffer = await file.arrayBuffer();
 
     onProgress?.(45);
-    let audioBuffer: AudioBuffer;
-    try {
-      audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-    } catch {
-      // Audio codec might not be directly decodable in this browser, use intelligent cadence
-      await audioCtx.close().catch(() => undefined);
-      return generateCadenceSpeechIntervals(fallbackDuration);
-    }
+    // Decode with a strict 1.2-second timeout race to prevent any freezing or hanging
+    const audioBuffer = await Promise.race<AudioBuffer>([
+      new Promise<AudioBuffer>((resolve, reject) => {
+        try {
+          const res = audioCtx.decodeAudioData(arrayBuffer, resolve, reject);
+          if (res && typeof res.then === 'function') {
+            res.then(resolve, reject);
+          }
+        } catch (e) {
+          reject(e);
+        }
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Audio decode timeout')), 1200)
+      ),
+    ]);
 
     await audioCtx.close().catch(() => undefined);
     onProgress?.(65);
