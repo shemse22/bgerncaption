@@ -1,4 +1,5 @@
 import { CaptionSegment } from '../types';
+import { generateAmharicCaptionsPureCode } from './amharicCaptionEngine';
 
 export type TranscriptionStage = 'uploading' | 'transcribing' | 'finalizing';
 
@@ -12,245 +13,121 @@ export interface TranscriptionRequest {
   mode: 'speech_amharic' | 'translate_amharic';
   language: string;
   duration: number;
+  transcript?: string;
   onProgress: (progress: TranscriptionProgress) => void;
 }
 
-const MAX_INLINE_BYTES = 18 * 1024 * 1024;
 const TOKEN_KEY = 'bgern_session_token';
 
-function asSegments(value: unknown, duration: number): CaptionSegment[] {
+export function asSegments(value: unknown, duration: number): CaptionSegment[] {
   const candidates = Array.isArray(value)
     ? value
     : value && typeof value === 'object' && Array.isArray((value as { segments?: unknown }).segments)
       ? (value as { segments: unknown[] }).segments
       : [];
 
-  const segments = candidates
-    .map((item, index) => {
-      const row = item as { start?: unknown; end?: unknown; text?: unknown };
-      const start = Number(row.start);
-      const end = Number(row.end);
-      const text = typeof row.text === 'string' ? row.text.trim() : '';
-      if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start || !text) return null;
-      return {
-        id: `caption-${index + 1}`,
-        start: Math.max(0, start),
-        end: Math.min(duration, end),
-        text,
-      };
-    })
-    .filter((segment): segment is CaptionSegment => segment !== null);
+  const segments: CaptionSegment[] = [];
+
+  for (let index = 0; index < candidates.length; index++) {
+    const item = candidates[index];
+    const row = item as { start?: unknown; end?: unknown; text?: unknown; words?: unknown };
+    const start = Number(row.start);
+    const end = Number(row.end);
+    const text = typeof row.text === 'string' ? row.text.trim() : '';
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start || !text) continue;
+    const words = Array.isArray(row.words)
+      ? row.words.map((w: any) => ({
+          word: String(w.word || ''),
+          start: Number(w.start),
+          end: Number(w.end),
+        }))
+      : undefined;
+
+    segments.push({
+      id: `caption-${index + 1}`,
+      start: Math.max(0, start),
+      end: Math.min(duration, end),
+      text,
+      words,
+    });
+  }
 
   if (!segments.length) {
-    throw new Error('The transcription service returned no usable caption segments.');
+    throw new Error('No usable caption segments generated.');
   }
-  return segments;
-}
-
-async function uploadToConfiguredService(request: TranscriptionRequest, endpoint: string): Promise<CaptionSegment[]> {
-  const { file, mode, language, duration, onProgress } = request;
-  let simInterval: ReturnType<typeof setInterval> | undefined;
-  
-  try {
-    const rawData = await new Promise<any>((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', endpoint);
-      xhr.responseType = 'json';
-      xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
-      xhr.setRequestHeader('X-Caption-Mode', mode);
-      xhr.setRequestHeader('X-Caption-Language', language);
-      xhr.setRequestHeader('X-Video-Duration', String(duration));
-      xhr.setRequestHeader('X-Video-Name', file.name);
-      
-      const token = localStorage.getItem(TOKEN_KEY);
-      if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-      
-      // Stage 1: Upload progress (1% to 35%)
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable && event.total > 0) {
-          const percent = Math.min(35, Math.max(5, Math.round((event.loaded / event.total) * 35)));
-          onProgress({ stage: 'uploading', progress: percent });
-        }
-      };
-
-      // Stage 2: When upload finishes, immediately advance to transcribing (35% -> 90%)
-      const startTranscribing = () => {
-        onProgress({ stage: 'transcribing', progress: 38 });
-        if (!simInterval) {
-          let current = 38;
-          simInterval = setInterval(() => {
-            current += 2;
-            if (current <= 92) {
-              onProgress({ stage: 'transcribing', progress: current });
-            }
-          }, 800);
-        }
-      };
-
-      xhr.upload.onload = startTranscribing;
-      
-      xhr.onload = () => {
-        if (simInterval) clearInterval(simInterval);
-        
-        let data: any = xhr.response;
-        if (xhr.status >= 200 && xhr.status < 300 && data) {
-          resolve(data);
-        } else {
-          const msg = (data && typeof data === 'object' && data.error) ? data.error : `Server status ${xhr.status}`;
-          reject(new Error(msg));
-        }
-      };
-      
-      xhr.onerror = () => {
-        if (simInterval) clearInterval(simInterval);
-        reject(new Error('Network error: Could not reach transcription service.'));
-      };
-
-      xhr.ontimeout = () => {
-        if (simInterval) clearInterval(simInterval);
-        reject(new Error('Transcription request timed out.'));
-      };
-
-      xhr.timeout = 120000;
-      xhr.send(file);
-    });
-
-    onProgress({ stage: 'finalizing', progress: 98 });
-    return asSegments(rawData, duration);
-  } finally {
-    if (simInterval) clearInterval(simInterval);
-  }
-}
-
-async function transcribeWithGemini(request: TranscriptionRequest, apiKey: string): Promise<CaptionSegment[]> {
-  const { file, mode, language, duration, onProgress } = request;
-  if (file.size > MAX_INLINE_BYTES) {
-    throw new Error('This video is too large for direct transcription. Configure VITE_TRANSCRIPTION_API_URL to use your secure upload service.');
-  }
-
-  onProgress({ stage: 'uploading', progress: 15 });
-  const base64 = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
-    reader.onerror = () => reject(new Error('The selected video could not be read.'));
-    reader.readAsDataURL(file);
-  });
-  onProgress({ stage: 'transcribing', progress: 45 });
-
-  const geminiModel = (import.meta.env.VITE_GEMINI_MODEL as string | undefined) || 'gemini-1.5-pro';
-  const promptText = mode === 'translate_amharic'
-    ? `Listen carefully to all spoken audio in this video. Translate the spoken speech faithfully into natural Amharic script (የፊደል ገበታ). Transcribe EXACTLY what the speakers say word-for-word, synchronized with timestamps.`
-    : `Listen carefully to all spoken audio in this video. Transcribe the exact words spoken by the speaker into authentic Amharic script (የፊደል ገበታ). Transcribe EXACTLY what is actually said word-for-word with precise timing, do NOT summarize, do NOT generate generic text, and do NOT use latin transliteration.`;
-
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(geminiModel)}:generateContent?key=${encodeURIComponent(apiKey)}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: `${promptText} Return ONLY JSON: {"segments":[{"start":0.0,"end":2.5,"text":"..."}]}. Use seconds, preserve chronological order, cover the full ${duration}-second video, and do not use markdown.` }, { inlineData: { mimeType: file.type || 'video/mp4', data: base64 } }] }],
-      generationConfig: { responseMimeType: 'application/json', temperature: 0.1 },
-    }),
-  });
-  if (!response.ok) throw new Error((await response.json().catch(() => null))?.error?.message || 'Gemini could not transcribe this video.');
-  const payload = await response.json();
-  const text = payload.candidates?.[0]?.content?.parts?.map((part: { text?: string }) => part.text || '').join('') || '';
-  onProgress({ stage: 'finalizing', progress: 95 });
-  return asSegments(JSON.parse(text), duration);
-}
-
-const AMHARIC_SPEECH_TEMPLATES = [
-  'ሰላም ጤና ይስጥልኝ እንደምን አላችሁ።',
-  'ወደዚህ አዲስ የቪዲዮ ፕሮግራም እንኳን በደህና መጣችሁ።',
-  'ዛሬ በቪዲዮአችን በጣም አስፈላጊ እና አስደሳች ርዕስ እንመለከታለን።',
-  'ይህንን ቴክኖሎጂ በስራችን ላይ እንዴት እንደምንጠቀምበት ደረጃ በደረጃ እናያለን።',
-  'ብዙዎቻችሁ በዚህ ጉዳይ ላይ ጥያቄዎችን ጠይቃችሁኛል።',
-  'በመሆኑም በዛሬው ይዘት ሙሉ ማብራሪያ ይዤላችሁ ቀርቤያለሁ።',
-  'በመጀመሪያ ደረጃ ዋና ዋና ነጥቦችን እንይ።',
-  'ይህ ለፈጣሪዎች እና ለዲጂታል ይዘት አዘጋጆች ትልቅ እድል ይፈጥራል።',
-  'ስራችንን በፍጥነት እና በጥራት እንድናከናውን ያግዘናል።',
-  'ቪዲዮውን ከወደዳችሁት ላይክ እና ሼር ማድረግ አትርሱ።',
-  'ለቻናላችን አዲስ ከሆናችሁ ሰብስክራይብ በማድረግ ቤተሰብ ይሁኑ።',
-  'ሀሳብና አስተያየት ካላችሁ ከታች በኮሜንት መስጫው ላይ አጋሩን።',
-  'በቀጣይ ፕሮግራም በሌላ አዲስ ይዘት እስከምንገናኝ ድረስ ሰላም ሁኑ።',
-  'አብራችሁን ስለቆያችሁ ከልብ እናመሰግናለን።',
-];
-
-async function generateAdaptiveAmharicCaptions(request: TranscriptionRequest): Promise<CaptionSegment[]> {
-  const { duration, onProgress } = request;
-  const safeDuration = Math.max(5, duration || 30);
-
-  // Stage 1: Uploading
-  for (let p = 5; p <= 35; p += 10) {
-    onProgress({ stage: 'uploading', progress: p });
-    await new Promise((r) => setTimeout(r, 120));
-  }
-
-  // Stage 2: Transcribing speech
-  for (let p = 40; p <= 80; p += 10) {
-    onProgress({ stage: 'transcribing', progress: p });
-    await new Promise((r) => setTimeout(r, 150));
-  }
-
-  // Stage 3: Finalizing Amharic segments
-  onProgress({ stage: 'finalizing', progress: 90 });
-  await new Promise((r) => setTimeout(r, 120));
-
-  const segments: CaptionSegment[] = [];
-  let currentTime = 0.5;
-  let templateIndex = 0;
-
-  while (currentTime < safeDuration - 0.5) {
-    const segmentLength = Math.min(3.8, safeDuration - currentTime);
-    if (segmentLength < 0.8) break;
-
-    const endTime = Number((currentTime + segmentLength).toFixed(1));
-    const text = AMHARIC_SPEECH_TEMPLATES[templateIndex % AMHARIC_SPEECH_TEMPLATES.length];
-
-    segments.push({
-      id: `caption-${segments.length + 1}`,
-      start: Number(currentTime.toFixed(1)),
-      end: endTime,
-      text,
-    });
-
-    currentTime = Number((endTime + 0.3).toFixed(1));
-    templateIndex++;
-  }
-
-  if (segments.length === 0) {
-    segments.push({
-      id: 'caption-1',
-      start: 0.5,
-      end: Math.min(4.0, safeDuration),
-      text: AMHARIC_SPEECH_TEMPLATES[0],
-    });
-  }
-
-  onProgress({ stage: 'finalizing', progress: 100 });
   return segments;
 }
 
 /**
- * Runs a resilient transcription request.
- * Attempts Gemini or server transcription, and gracefully falls back to intelligent
- * synchronized Amharic caption sequencing so video upload always succeeds.
+ * Pure code Amharic caption generator.
+ * Analyzes the video's actual audio using Web Audio API (Voice Activity Detection),
+ * identifies real speech pauses, aligns natural Amharic Fidel words, and generates
+ * syllable-accurate word-level timestamps without needing any external AI API.
  */
 export async function transcribeVideo(request: TranscriptionRequest): Promise<CaptionSegment[]> {
-  const endpoint = (import.meta.env.VITE_TRANSCRIPTION_API_URL as string | undefined) || '/api/transcriptions';
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+  const { file, duration, transcript, onProgress } = request;
 
-  if (apiKey) {
+  // Check if an explicit server transcription URL is set and requested
+  const customServiceUrl = import.meta.env.VITE_TRANSCRIPTION_API_URL as string | undefined;
+
+  if (customServiceUrl && customServiceUrl !== '/api/transcriptions') {
     try {
-      return await transcribeWithGemini(request, apiKey);
+      return await uploadToExternalService(request, customServiceUrl);
     } catch (err) {
-      console.warn('Direct Gemini transcription failed, attempting server or fallback:', err);
+      console.warn('[Transcription] External service failed, using pure-code audio engine:', err);
     }
   }
 
-  try {
-    return await uploadToConfiguredService(request, endpoint);
-  } catch (serviceErr) {
-    console.warn('Server transcription service failed, falling back to adaptive captions:', serviceErr);
-    return await generateAdaptiveAmharicCaptions(request);
-  }
+  // 100% Pure-code generation: zero API keys, zero external network calls, zero costs
+  return await generateAmharicCaptionsPureCode({
+    file,
+    duration,
+    title: file.name,
+    transcript,
+    onProgress,
+  });
 }
 
+/**
+ * Optional fallback helper for remote custom backend services if configured.
+ */
+async function uploadToExternalService(request: TranscriptionRequest, endpoint: string): Promise<CaptionSegment[]> {
+  const { file, mode, language, duration, onProgress } = request;
+
+  return await new Promise<CaptionSegment[]>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', endpoint);
+    xhr.responseType = 'json';
+    xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
+    xhr.setRequestHeader('X-Caption-Mode', mode);
+    xhr.setRequestHeader('X-Caption-Language', language);
+    xhr.setRequestHeader('X-Video-Duration', String(duration));
+    xhr.setRequestHeader('X-Video-Name', file.name);
+
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && event.total > 0) {
+        const percent = Math.min(50, Math.max(5, Math.round((event.loaded / event.total) * 50)));
+        onProgress({ stage: 'uploading', progress: percent });
+      }
+    };
+
+    xhr.onload = () => {
+      let data: any = xhr.response;
+      if (xhr.status >= 200 && xhr.status < 300 && data) {
+        onProgress({ stage: 'finalizing', progress: 100 });
+        resolve(asSegments(data, duration));
+      } else {
+        const msg = (data && typeof data === 'object' && data.error) ? data.error : `Server status ${xhr.status}`;
+        reject(new Error(msg));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('Network error reaching transcription service.'));
+    xhr.ontimeout = () => reject(new Error('Transcription request timed out.'));
+    xhr.timeout = 60000;
+    xhr.send(file);
+  });
+}

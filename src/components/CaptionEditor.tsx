@@ -556,7 +556,16 @@ export const CaptionEditor: React.FC<CaptionEditorProps> = ({
                 let rawText = activeCaption.text.trim();
                 const words = rawText.split(/\s+/).filter(Boolean);
                 const ratio = Math.min(0.999, elapsed / segDuration);
-                const activeWordIdx = Math.floor(ratio * words.length);
+                let activeWordIdx = Math.floor(ratio * words.length);
+
+                if (Array.isArray(activeCaption.words) && activeCaption.words.length > 0) {
+                  const matchedIdx = activeCaption.words.findIndex(
+                    (w) => currentTime >= w.start && currentTime <= w.end
+                  );
+                  if (matchedIdx !== -1) {
+                    activeWordIdx = matchedIdx;
+                  }
+                }
                 
                 if (style.preset === 'typewriter') {
                   const charCount = Math.max(1, Math.floor(ratio * rawText.length));

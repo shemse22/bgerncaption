@@ -25,6 +25,7 @@ export interface CaptionSegment {
   start: number; // in seconds
   end: number;   // in seconds
   text: string;  // Amharic text
+  words?: Array<{ word: string; start: number; end: number }>;
 }
 
 export type CaptionPreset =
