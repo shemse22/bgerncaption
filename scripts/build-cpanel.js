@@ -25,11 +25,13 @@ console.log('⚙️ Step 2: Bundling Express Server for Node.js...');
 const esbuildCmd = 'npx esbuild server.ts --bundle --platform=node --target=node18 --outfile=cpanel-deploy/app.js --external:pg-native';
 execSync(esbuildCmd, { cwd: rootDir, stdio: 'inherit' });
 
-// 4. Copy dist/ into cpanel-deploy/dist/
+// 4. Copy dist/ into cpanel-deploy/ and cpanel-deploy/dist/
 console.log('📂 Step 3: Copying static assets...');
 const distSrc = path.resolve(rootDir, 'dist');
 const distDest = path.resolve(outDir, 'dist');
 fs.cpSync(distSrc, distDest, { recursive: true });
+// Also copy directly to outDir so extracting into public_html places files directly at root
+fs.cpSync(distSrc, outDir, { recursive: true });
 
 // 5. Copy .htaccess
 const htaccessSrc = path.resolve(rootDir, '.htaccess');
