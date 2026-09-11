@@ -15,17 +15,18 @@ import {
   Sparkles,
   ShieldCheck,
   FileCheck,
+  ChevronRight,
 } from 'lucide-react';
 import { User, MinuteTransaction, PricingPackage, PaymentRecord, SystemSettings, ManualPaymentPlatform } from '../types';
 import { formatTimeSeconds } from '../lib/subtitles';
-import { INITIAL_PACKAGES } from '../lib/amharicData';
+import { INITIAL_PACKAGES, ALL_PLANS_INCLUDED_FEATURES } from '../lib/amharicData';
 import { StorageAPI, INITIAL_PAYMENT_PLATFORMS } from '../lib/storage';
 
 interface WalletViewProps {
   user: User;
   transactions: MinuteTransaction[];
   onSubmitReceipt: (payment: PaymentRecord) => void;
-  onActivatePackage?: (packageId: 'starter' | 'creator' | 'pro', method?: string) => void;
+  onActivatePackage?: (packageId: string, method?: string) => void;
   settings?: SystemSettings;
   autoOpenPaymentModal?: boolean;
   onModalClosed?: () => void;
@@ -125,15 +126,7 @@ export const WalletView: React.FC<WalletViewProps> = ({
 
   const isExpired = user.availableMinutes <= 0;
   const currentPkg = INITIAL_PACKAGES.find((p) => p.id === user.plan);
-  const totalPkgMinutes = currentPkg
-    ? currentPkg.minutes
-    : user.plan === 'starter'
-    ? 10
-    : user.plan === 'creator'
-    ? 15
-    : user.plan === 'pro'
-    ? 50
-    : 3;
+  const totalPkgMinutes = currentPkg ? currentPkg.minutes : 14;
   const totalPkgSeconds = totalPkgMinutes * 60;
   const remainingPercent =
     totalPkgSeconds > 0 ? Math.min(100, Math.max(0, Math.round((user.availableMinutes / totalPkgSeconds) * 100))) : 0;
@@ -223,96 +216,98 @@ export const WalletView: React.FC<WalletViewProps> = ({
         </div>
       </div>
 
-      {/* Package Rule Banner */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-500/30 text-xs text-purple-200 flex items-start gap-3 shadow-xs">
-        <Sparkles className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
-        <div className="space-y-1">
-          <p className="font-bold text-white text-sm">How Bgern Packages Work</p>
-          <p className="text-slate-300 leading-relaxed">
-            Every package provides dedicated minutes to generate video subtitles (<strong>Starter: 10 min</strong>, <strong>Creator: 15 min</strong>, <strong>Pro: 50 min</strong>).
-            Once your package minutes are finished, the package <strong>strictly expires</strong>. You can upgrade to <strong>Creator</strong> or <strong>Pro</strong>, or renew <strong>Starter</strong> at any time to continue.
-          </p>
+      {/* Top Banner: ALL PLANS INCLUDE */}
+      <div className="rounded-2xl bg-[#111622] border border-slate-800/80 p-4 sm:p-5 flex flex-col md:flex-row items-center gap-4 sm:gap-6 shadow-xl">
+        <div className="shrink-0 md:pr-6 md:border-r border-slate-800/80 text-center md:text-left">
+          <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+            ALL PLANS INCLUDE
+          </span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 w-full">
+          {ALL_PLANS_INCLUDED_FEATURES.map((feat) => (
+            <div key={feat} className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-200">
+              <span className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                <Check className="w-2.5 h-2.5 stroke-[3]" />
+              </span>
+              <span>{feat}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Buy Minutes Packages */}
-      <div id="pricing-packages" className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-900 dark:text-white">Transcription Packages</h2>
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Instant ETB Pricing</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div id="pricing-packages" className="space-y-4 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 items-stretch">
           {INITIAL_PACKAGES.map((pkg) => {
-            const isSelected = selectedPackage?.id === pkg.id;
+            const isPopular = Boolean(pkg.popular);
+
             return (
               <div
                 key={pkg.id}
-                className={`relative rounded-3xl p-5 border transition-all flex flex-col justify-between ${
-                  pkg.badge
-                    ? 'border-blue-500 bg-blue-50/20 dark:bg-blue-950/20 shadow-md ring-1 ring-blue-500/30'
-                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300'
+                className={`relative rounded-3xl p-6 transition-all duration-200 flex flex-col justify-between ${
+                  isPopular
+                    ? 'border-2 border-blue-500 bg-[#121c2e] ring-1 ring-blue-500/50 shadow-2xl shadow-blue-500/20 md:-translate-y-1'
+                    : 'border border-slate-800/80 bg-[#131926] hover:border-slate-700 shadow-xl'
                 }`}
               >
-                {pkg.badge && (
-                  <div className="absolute -top-3 right-4 px-3 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                    {pkg.badge}
+                {/* Popular Badge */}
+                {isPopular && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-blue-600 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-md shadow-blue-500/40 whitespace-nowrap">
+                    {pkg.badge || 'MOST POPULAR'}
                   </div>
                 )}
 
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">{pkg.name}</h3>
-                  <div className="mt-3 flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-slate-900 dark:text-white">{pkg.priceEtb}</span>
-                    <span className="text-xs font-bold text-slate-500">ETB</span>
-                    <span className="text-xs text-slate-400 ml-1">/ {pkg.minutes} min</span>
+                <div className="space-y-4">
+                  {/* Plan Name */}
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">
+                    {pkg.name}
+                  </h3>
+
+                  {/* Price */}
+                  <div className="flex items-baseline gap-1 pt-1">
+                    <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+                      {pkg.priceEtb}
+                    </span>
+                    <span className="text-xs font-bold text-slate-400 ml-1">
+                      ETB
+                    </span>
                   </div>
 
-                  <ul className="mt-4 space-y-2 text-xs text-slate-600 dark:text-slate-300">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>{pkg.minutes} Minutes of Audio/Video Subtitles</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Expires after {pkg.minutes} minutes generated</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Amharic Speech Recognition & Styling</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Export .SRT & Burn into Video</span>
-                    </li>
-                  </ul>
+                  {/* Duration */}
+                  <div className="pt-2 flex items-center gap-2 text-slate-300 text-sm font-semibold">
+                    <Clock className="w-4 h-4 text-slate-400 stroke-[2.2]" />
+                    <span>{pkg.minutes} Minute</span>
+                  </div>
+
+                  {/* Credits */}
+                  <div className="flex items-baseline gap-1.5 pt-0.5">
+                    <span className="text-base sm:text-lg font-extrabold text-white tracking-tight">
+                      {pkg.credits?.toLocaleString() || '30,000'}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                      CREDITS
+                    </span>
+                  </div>
                 </div>
 
-                <button
-                  onClick={() => {
-                    setSelectedPackage(pkg);
-                    setShowUploadModal(true);
-                  }}
-                  className={`mt-6 w-full min-h-[44px] py-2.5 rounded-2xl font-bold text-xs transition active:scale-95 touch-tap flex items-center justify-center gap-1.5 ${
-                    pkg.badge
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 hover:bg-blue-700'
-                      : isExpired
-                      ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-500/20'
-                      : 'bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700'
-                  }`}
-                >
-                  {isExpired ? (
-                    pkg.id === user.plan ? (
-                      <span>Renew Starter ({pkg.priceEtb} ETB)</span>
-                    ) : (
-                      <span>Upgrade to {pkg.name} ({pkg.priceEtb} ETB)</span>
-                    )
-                  ) : pkg.id === user.plan ? (
-                    <span>Renew {pkg.name} (+{pkg.minutes} min)</span>
-                  ) : (
-                    <span>Upgrade to {pkg.name} ({pkg.priceEtb} ETB)</span>
-                  )}
-                </button>
+                {/* Action Button */}
+                <div className="pt-8">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedPackage(pkg);
+                      setShowUploadModal(true);
+                    }}
+                    className={`w-full py-3.5 px-4 rounded-2xl font-bold text-xs transition active:scale-95 touch-tap flex items-center justify-center gap-1.5 shadow-md ${
+                      isPopular
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/40'
+                        : 'bg-[#232936] hover:bg-[#2e3748] text-white border border-slate-700/50'
+                    }`}
+                  >
+                    <span>{pkg.buttonText || `Get ${pkg.name}`}</span>
+                    <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                  </button>
+                </div>
               </div>
             );
           })}

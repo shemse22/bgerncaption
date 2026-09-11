@@ -18,6 +18,7 @@ import {
   Sliders,
   Trash2,
   ChevronRight,
+  Check,
 } from 'lucide-react';
 import { User, Project } from '../types';
 import { formatTimeSeconds } from '../lib/subtitles';
@@ -25,7 +26,7 @@ import { DeleteProjectModal } from './DeleteProjectModal';
 import { useAuthService } from './ClerkAuthProvider';
 import { YouTubeShortsIcon, TikTokIcon, InstagramIcon, FacebookIcon } from './PlatformIcons';
 import { SampleVideoShowcase } from './SampleVideoShowcase';
-import { SampleVideo } from '../lib/amharicData';
+import { SampleVideo, INITIAL_PACKAGES, ALL_PLANS_INCLUDED_FEATURES } from '../lib/amharicData';
 
 interface HomeDashboardProps {
   user: User;
@@ -677,7 +678,115 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </div>
       </section>
 
-      {/* 5. FREQUENTLY ASKED QUESTIONS (FAQ) */}
+      {/* 5. PRICING & PACKAGES (Matching Design) */}
+      <section id="pricing" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-slate-800/80 scroll-mt-20">
+        <div className="text-center mb-12 space-y-3">
+          <span className="px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-widest bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            PRICING
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Simple, Transparent Pricing
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto">
+            Choose the package that matches your content creation volume. Instant activation via Telebirr or CBE.
+          </p>
+        </div>
+
+        {/* Top Banner: ALL PLANS INCLUDE */}
+        <div className="rounded-2xl bg-[#111622] border border-slate-800/80 p-4 sm:p-5 flex flex-col md:flex-row items-center gap-4 sm:gap-6 shadow-xl mb-8">
+          <div className="shrink-0 md:pr-6 md:border-r border-slate-800/80 text-center md:text-left">
+            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+              ALL PLANS INCLUDE
+            </span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 w-full">
+            {ALL_PLANS_INCLUDED_FEATURES.map((feat) => (
+              <div key={feat} className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-200">
+                <span className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <Check className="w-2.5 h-2.5 stroke-[3]" />
+                </span>
+                <span>{feat}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 4 Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 items-stretch">
+          {INITIAL_PACKAGES.map((pkg) => {
+            const isPopular = Boolean(pkg.popular);
+
+            return (
+              <div
+                key={pkg.id}
+                className={`relative rounded-3xl p-6 transition-all duration-200 flex flex-col justify-between ${
+                  isPopular
+                    ? 'border-2 border-blue-500 bg-[#121c2e] ring-1 ring-blue-500/50 shadow-2xl shadow-blue-500/20 md:-translate-y-1'
+                    : 'border border-slate-800/80 bg-[#131926] hover:border-slate-700 shadow-xl'
+                }`}
+              >
+                {/* Popular Badge */}
+                {isPopular && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-blue-600 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-md shadow-blue-500/40 whitespace-nowrap">
+                    {pkg.badge || 'MOST POPULAR'}
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  {/* Plan Name */}
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">
+                    {pkg.name}
+                  </h3>
+
+                  {/* Price */}
+                  <div className="flex items-baseline gap-1 pt-1">
+                    <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+                      {pkg.priceEtb}
+                    </span>
+                    <span className="text-xs font-bold text-slate-400 ml-1">
+                      ETB
+                    </span>
+                  </div>
+
+                  {/* Duration */}
+                  <div className="pt-2 flex items-center gap-2 text-slate-300 text-sm font-semibold">
+                    <Clock className="w-4 h-4 text-slate-400 stroke-[2.2]" />
+                    <span>{pkg.minutes} Minute</span>
+                  </div>
+
+                  {/* Credits */}
+                  <div className="flex items-baseline gap-1.5 pt-0.5">
+                    <span className="text-base sm:text-lg font-extrabold text-white tracking-tight">
+                      {pkg.credits?.toLocaleString() || '30,000'}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                      CREDITS
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <div className="pt-8">
+                  <button
+                    type="button"
+                    onClick={onOpenWallet}
+                    className={`w-full py-3.5 px-4 rounded-2xl font-bold text-xs transition active:scale-95 touch-tap flex items-center justify-center gap-1.5 shadow-md ${
+                      isPopular
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/40'
+                        : 'bg-[#232936] hover:bg-[#2e3748] text-white border border-slate-700/50'
+                    }`}
+                  >
+                    <span>{pkg.buttonText || `Get ${pkg.name}`}</span>
+                    <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 6. FREQUENTLY ASKED QUESTIONS (FAQ) */}
       <section id="faq" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-b border-slate-800/80">
         <div className="text-center mb-12">
           <span className="px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-widest bg-purple-500/10 text-purple-400 border border-purple-500/30">

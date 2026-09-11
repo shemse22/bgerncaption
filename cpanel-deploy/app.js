@@ -73958,30 +73958,55 @@ var DEFAULT_STYLE = {
   animationSpeed: "normal",
   highlightStyle: "default"
 };
+var ALL_PLANS_INCLUDED_FEATURES = [
+  "Fast Processing",
+  "Max 15 Minutes Limit",
+  "1080p Export",
+  "Accurate Captions",
+  "AI Voiceovers",
+  "AI Clipping"
+];
 var INITIAL_PACKAGES = [
   {
-    id: "starter",
-    name: "Starter",
-    minutes: 10,
-    priceEtb: 25,
+    id: "lite",
+    name: "LITE",
+    minutes: 4,
+    priceEtb: 50,
+    credits: 3e4,
     popular: false,
-    features: ["10 minutes processing", "Standard Amharic STT", "SRT & VTT Export", "720p Video Burn"]
+    buttonText: "Get Lite",
+    features: ALL_PLANS_INCLUDED_FEATURES
   },
   {
-    id: "creator",
-    name: "Creator",
-    minutes: 15,
-    priceEtb: 50,
+    id: "plus",
+    name: "PLUS",
+    minutes: 14,
+    priceEtb: 150,
+    credits: 9e4,
     popular: true,
-    features: ["15 minutes processing", "High Accuracy Amharic STT", "All Caption Styles", "1080p Video Burn", "Priority Queue"]
+    badge: "MOST POPULAR",
+    buttonText: "Get Plus",
+    features: ALL_PLANS_INCLUDED_FEATURES
   },
   {
     id: "pro",
-    name: "Pro",
-    minutes: 50,
-    priceEtb: 200,
+    name: "PRO",
+    minutes: 29,
+    priceEtb: 300,
+    credits: 18e4,
     popular: false,
-    features: ["50 minutes processing", "Maximum STT Accuracy", "Batch Processing", "Watermark-free 1080p", "VIP Support"]
+    buttonText: "Get Pro",
+    features: ALL_PLANS_INCLUDED_FEATURES
+  },
+  {
+    id: "max",
+    name: "MAX",
+    minutes: 59,
+    priceEtb: 600,
+    credits: 36e4,
+    popular: false,
+    buttonText: "Get Max",
+    features: ALL_PLANS_INCLUDED_FEATURES
   }
 ];
 var SAMPLE_VIDEOS = [
@@ -74807,7 +74832,7 @@ app.post("/api/payments/verify", async (req, res) => {
     type: "payment"
   }, ...db.notifications];
   if (verified.ok) {
-    const targetPlan = ["starter", "creator", "pro"].includes(stored.packageId) ? stored.packageId : "starter";
+    const targetPlan = stored.packageId || "plus";
     db.users = db.users.map((u) => u.id === user.id ? { ...u, plan: targetPlan, status: "active" } : u);
     addTransaction(db, {
       id: `tx-${import_node_crypto.default.randomUUID()}`,
@@ -74826,9 +74851,10 @@ app.post("/api/payments/verify", async (req, res) => {
 app.post("/api/packages/activate", async (req, res) => {
   const user = await requireUser(req, res);
   if (!user) return;
-  const packageId = String(req.body?.packageId || "starter");
-  const targetPlan = ["starter", "creator", "pro"].includes(packageId) ? packageId : "starter";
-  const pkgMinutes = targetPlan === "starter" ? 10 : targetPlan === "creator" ? 15 : 50;
+  const packageId = String(req.body?.packageId || "plus");
+  const matchedPkg = INITIAL_PACKAGES.find((p) => p.id === packageId) || INITIAL_PACKAGES[0];
+  const targetPlan = matchedPkg.id;
+  const pkgMinutes = matchedPkg.minutes;
   const db = await readDb();
   db.users = db.users.map((u) => u.id === user.id ? { ...u, plan: targetPlan, status: "active" } : u);
   addTransaction(db, {
@@ -74852,7 +74878,7 @@ app.post("/api/admin/payments/:id/approve", async (req, res) => {
   if (payment.status === "approved") return res.status(409).json({ success: false, message: "Payment is already approved." });
   payment.status = "approved";
   payment.reviewedAt = (/* @__PURE__ */ new Date()).toISOString();
-  const targetPlan = ["starter", "creator", "pro"].includes(payment.packageId) ? payment.packageId : "starter";
+  const targetPlan = payment.packageId || "plus";
   db.users = db.users.map((u) => u.id === payment.userId ? { ...u, plan: targetPlan, status: "active" } : u);
   addTransaction(db, {
     id: `tx-${import_node_crypto.default.randomUUID()}`,

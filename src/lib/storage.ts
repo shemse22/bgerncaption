@@ -403,7 +403,7 @@ export const StorageAPI = {
 
   activatePackage: (
     userId: string,
-    packageId: 'starter' | 'creator' | 'pro',
+    packageId: string,
     paymentMethod: string = 'Instant Activation'
   ): { user: User; message: string } => {
     const pkg = INITIAL_PACKAGES.find((p) => p.id === packageId) || INITIAL_PACKAGES[0];
@@ -509,9 +509,7 @@ export const StorageAPI = {
     saveToStorage(PAYMENTS_KEY, payments);
 
     // Determine target plan
-    const targetPlan = (['starter', 'creator', 'pro'].includes(payment.packageId)
-      ? payment.packageId
-      : 'starter') as User['plan'];
+    const targetPlan = (payment.packageId || 'plus') as User['plan'];
 
     // Add minutes to ledger
     const secondsToAdd = payment.minutes * 60;

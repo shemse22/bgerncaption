@@ -587,9 +587,7 @@ app.post('/api/payments/verify', async (req, res) => {
     type: 'payment',
   }, ...db.notifications];
   if (verified.ok) {
-    const targetPlan = (['starter', 'creator', 'pro'].includes(stored.packageId)
-      ? stored.packageId
-      : 'starter') as User['plan'];
+    const targetPlan = (stored.packageId || 'plus') as User['plan'];
     db.users = db.users.map((u) => (u.id === user.id ? { ...u, plan: targetPlan, status: 'active' as const } : u));
     addTransaction(db, {
       id: `tx-${crypto.randomUUID()}`,
@@ -609,9 +607,10 @@ app.post('/api/payments/verify', async (req, res) => {
 app.post('/api/packages/activate', async (req: Request, res: Response) => {
   const user = await requireUser(req, res);
   if (!user) return;
-  const packageId = String(req.body?.packageId || 'starter');
-  const targetPlan = (['starter', 'creator', 'pro'].includes(packageId) ? packageId : 'starter') as User['plan'];
-  const pkgMinutes = targetPlan === 'starter' ? 10 : targetPlan === 'creator' ? 15 : 50;
+  const packageId = String(req.body?.packageId || 'plus');
+  const matchedPkg = INITIAL_PACKAGES.find((p) => p.id === packageId) || INITIAL_PACKAGES[0];
+  const targetPlan = matchedPkg.id as User['plan'];
+  const pkgMinutes = matchedPkg.minutes;
   const db = await readDb();
   db.users = db.users.map((u) => (u.id === user.id ? { ...u, plan: targetPlan, status: 'active' as const } : u));
   addTransaction(db, {
@@ -636,9 +635,7 @@ app.post('/api/admin/payments/:id/approve', async (req, res) => {
   if (payment.status === 'approved') return res.status(409).json({ success: false, message: 'Payment is already approved.' });
   payment.status = 'approved';
   payment.reviewedAt = new Date().toISOString();
-  const targetPlan = (['starter', 'creator', 'pro'].includes(payment.packageId)
-    ? payment.packageId
-    : 'starter') as User['plan'];
+  const targetPlan = (payment.packageId || 'plus') as User['plan'];
   db.users = db.users.map((u) => (u.id === payment.userId ? { ...u, plan: targetPlan, status: 'active' as const } : u));
   addTransaction(db, {
     id: `tx-${crypto.randomUUID()}`,

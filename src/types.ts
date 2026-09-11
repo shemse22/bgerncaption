@@ -8,7 +8,7 @@ export interface User {
   googleOriginalAvatar?: string;
   role: Role;
   availableMinutes: number; // in seconds or decimal minutes
-  plan: 'free' | 'starter' | 'creator' | 'pro';
+  plan: 'free' | 'lite' | 'plus' | 'pro' | 'max' | 'starter' | 'creator' | string;
   status: 'active' | 'suspended';
   createdAt: string;
   provider?: 'clerk' | 'google' | 'guest';
@@ -122,8 +122,10 @@ export interface PricingPackage {
   name: string;
   minutes: number;
   priceEtb: number;
+  credits?: number;
   popular?: boolean;
   badge?: string;
+  buttonText?: string;
   features: string[];
 }
 
